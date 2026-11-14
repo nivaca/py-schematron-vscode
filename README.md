@@ -20,8 +20,8 @@ Open a terminal. In VS Code: menu **Terminal → New Terminal**. Then type:
 
 | System | Type this | You should see |
 |---|---|---|
-| Linux, macOS | `python3 --version` | `Python 3.9` or a higher number |
-| Windows | `py --version` | `Python 3.9` or a higher number |
+| Linux, macOS | `python3 --version` | `Python 3.15` or a higher number |
+| Windows | `py --version` | `Python 3.15` or a higher number |
 
 If you get an error such as *command not found*, install Python first:
 

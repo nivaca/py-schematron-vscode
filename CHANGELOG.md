@@ -6,6 +6,14 @@ changed. The releases, with their `.vsix` files, are on
 [Codeberg](https://codeberg.org/nivaca/py-validate/releases) and
 [GitHub](https://github.com/nivaca/py-validate/releases).
 
+## 0.5.6 — 2026-11-14
+
+- validate.py 1.11, which needs Python 3.15 or later: with an older
+  Python it now says so at once (*validate.py necesita Python 3.15 o
+  posterior*), and the extension shows that message, instead of failing
+  later in a less clear way. **Before you start** asks for Python 3.15
+  (it said 3.9).
+
 ## 0.5.5 — 2026-11-12
 
 - Clear setup instructions for newcomers: the README opens with
