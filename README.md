@@ -1,7 +1,7 @@
 # Schematron Validator for VS Code
 
-Validates XML/TEI documents against Schematron rules using
-[xmlvalidate.py](https://codeberg.org/nivaca/py-xmlvalidate). It can also check
+Validates XML/TEI documents against Schematron rules with `xmlvalidate.py`,
+the program of [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate). It can also check
 RelaxNG structure with jing. Results appear as squiggles in the editor and in
 the Problems panel.
 
@@ -81,7 +81,7 @@ instruction pointing to its schema, as TEI files usually do. Within a
 second or two the status bar, at the bottom right, shows
 **✓ Schematron** (no problems) or **Schematron: 3** (three problems,
 underlined in the text). To try it on a ready-made example, download
-`validate-schematron-v.*.zip` from the
+`py-xmlvalidate-v.*.zip` from the
 [releases](https://github.com/nivaca/py-xmlvalidate/releases), unzip it, and
 open `docs/example/edition.xml`: it has six deliberate mistakes in its
 Schematron rules (and a seventh, structural one, if you install jing).

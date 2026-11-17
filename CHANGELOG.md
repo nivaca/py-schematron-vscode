@@ -6,6 +6,15 @@ changed. The releases, with their `.vsix` files, are on
 [Codeberg](https://codeberg.org/nivaca/py-xmlvalidate/releases) and
 [GitHub](https://github.com/nivaca/py-xmlvalidate/releases).
 
+## 0.5.9 — 2026-11-17
+
+- The extension's title names the project: *Schematron Validator
+  (py-xmlvalidate)*. Its name and its ID, `NicolasVaughan.validate-schematron`,
+  stay the same, so it updates as usual.
+- The README names the project py-xmlvalidate, whose program is
+  `xmlvalidate.py`, and the release zip it mentions is now
+  `py-xmlvalidate-v.*.zip`.
+
 ## 0.5.8 — 2026-11-17 (xmlvalidate.py 1.12)
 
 - The bundled script is renamed **xmlvalidate.py** (it was validate.py),
