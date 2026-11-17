@@ -3,8 +3,15 @@
 All notable changes to the Schematron Validator extension. Each version
 bundles its own copy of `validate.py`; its version is given where it
 changed. The releases, with their `.vsix` files, are on
-[Codeberg](https://codeberg.org/nivaca/py-validate/releases) and
-[GitHub](https://github.com/nivaca/py-validate/releases).
+[Codeberg](https://codeberg.org/nivaca/py-xmlvalidate/releases) and
+[GitHub](https://github.com/nivaca/py-xmlvalidate/releases).
+
+## 0.5.7 — 2026-11-17
+
+- Links point to the repositories' new name, py-xmlvalidate: the README,
+  the **Setup Guide** button and command, and the repository in the
+  extension's details. The extension keeps its name and its ID,
+  `NicolasVaughan.validate-schematron`.
 
 ## 0.5.6 — 2026-11-14
 

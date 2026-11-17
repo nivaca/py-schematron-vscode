@@ -2,7 +2,7 @@
   "name": "validate-schematron",
   "displayName": "Schematron Validator (validate.py)",
   "description": "Validates XML/TEI documents against Schematron rules (from a .sch, an ODD or a RelaxNG with embedded rules) and, optionally, RelaxNG structure via jing, as you type. Requires Python 3 with the saxonche and lxml libraries: see 'Before you start'.",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "publisher": "NicolasVaughan",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -12,7 +12,7 @@
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://codeberg.org/nivaca/py-validate"
+    "url": "https://codeberg.org/nivaca/py-xmlvalidate"
   },
   "engines": {
     "vscode": "^1.85.0"

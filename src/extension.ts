@@ -31,7 +31,7 @@ const outcomes = new Map<string, Outcome>();
 let statusItem: vscode.StatusBarItem;
 
 /** The step-by-step setup instructions (the README's "Before you start"). */
-const SETUP_GUIDE = 'https://github.com/nivaca/py-validate/tree/main/vscode#before-you-start';
+const SETUP_GUIDE = 'https://github.com/nivaca/py-xmlvalidate/tree/main/vscode#before-you-start';
 const openSetupGuide = () => vscode.env.openExternal(vscode.Uri.parse(SETUP_GUIDE));
 
 /** Pending "validate after typing" timers, per document. */

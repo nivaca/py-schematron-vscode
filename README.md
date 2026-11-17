@@ -1,11 +1,11 @@
 # Schematron Validator for VS Code
 
 Validates XML/TEI documents against Schematron rules using
-[validate.py](https://codeberg.org/nivaca/py-validate). It can also check
+[validate.py](https://codeberg.org/nivaca/py-xmlvalidate). It can also check
 RelaxNG structure with jing. Results appear as squiggles in the editor and in
 the Problems panel.
 
-![The extension on a TEI document: errors underlined, the message of one, the Problems panel and the count in the status bar](https://codeberg.org/nivaca/py-validate/raw/branch/main/docs/img/vscode_dark.png)
+![The extension on a TEI document: errors underlined, the message of one, the Problems panel and the count in the status bar](https://codeberg.org/nivaca/py-xmlvalidate/raw/branch/main/docs/img/vscode_dark.png)
 
 ## Before you start
 
@@ -82,7 +82,7 @@ second or two the status bar, at the bottom right, shows
 **✓ Schematron** (no problems) or **Schematron: 3** (three problems,
 underlined in the text). To try it on a ready-made example, download
 `validate-schematron-v.*.zip` from the
-[releases](https://github.com/nivaca/py-validate/releases), unzip it, and
+[releases](https://github.com/nivaca/py-xmlvalidate/releases), unzip it, and
 open `docs/example/edition.xml`: it has six deliberate mistakes in its
 Schematron rules (and a seventh, structural one, if you install jing).
 
@@ -204,7 +204,7 @@ says so.
 ## License
 
 Copyright (C) 2026 Nicolas Vaughan. Free software under the GNU General
-Public License, version 3 or later; see [LICENSE](https://codeberg.org/nivaca/py-validate/src/branch/main/LICENSE).
+Public License, version 3 or later; see [LICENSE](https://codeberg.org/nivaca/py-xmlvalidate/src/branch/main/LICENSE).
 
 ## Building
 
