@@ -1,10 +1,17 @@
 # Changelog
 
 All notable changes to the Schematron Validator extension. Each version
-bundles its own copy of `xmlvalidate.py`; its version is given where it
+bundles its own copy of `py-xmlvalidate.py`; its version is given where it
 changed. The releases, with their `.vsix` files, are on
 [Codeberg](https://codeberg.org/nivaca/py-xmlvalidate/releases) and
 [GitHub](https://github.com/nivaca/py-xmlvalidate/releases).
+
+## 0.5.10 — 2026-11-17 (py-xmlvalidate.py 1.13)
+
+- The bundled script takes the project's name: **py-xmlvalidate.py** (it
+  was xmlvalidate.py). If you set `schematron.validatorPath` to your own
+  copy of the script, point it to `py-xmlvalidate.py`. The extension's
+  name, ID and title stay the same.
 
 ## 0.5.9 — 2026-11-17
 

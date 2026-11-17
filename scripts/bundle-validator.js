@@ -1,4 +1,4 @@
-// Copies ../xmlvalidate.py and ../LICENSE into the extension folder so the
+// Copies ../py-xmlvalidate.py and ../LICENSE into the extension folder so the
 // packaged .vsix works on its own (schematron.validatorPath can override it).
 const fs = require('fs');
 const path = require('path');
@@ -10,6 +10,6 @@ const ext = path.resolve(__dirname, '..');
 // the script under a former name, gets into the package)
 fs.rmSync(path.join(ext, 'validator'), { recursive: true, force: true });
 fs.mkdirSync(path.join(ext, 'validator'), { recursive: true });
-fs.copyFileSync(path.join(root, 'xmlvalidate.py'), path.join(ext, 'validator', 'xmlvalidate.py'));
+fs.copyFileSync(path.join(root, 'py-xmlvalidate.py'), path.join(ext, 'validator', 'py-xmlvalidate.py'));
 fs.copyFileSync(path.join(root, 'LICENSE'), path.join(ext, 'LICENSE'));
-console.log('bundled xmlvalidate.py and LICENSE');
+console.log('bundled py-xmlvalidate.py and LICENSE');

@@ -93,9 +93,9 @@ test('explainFailure: other errors keep the last meaningful lines', () => {
     { interpreter: false, message: 'No existe el documento: /x.xml' });
 });
 
-// End-to-end against the real xmlvalidate.py, when VALIDATE_PYTHON points at an
+// End-to-end against the real py-xmlvalidate.py, when VALIDATE_PYTHON points at an
 // interpreter with saxonche (skipped otherwise).
-test('xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON }, () => {
+test('py-xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON }, () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sch-'));
   const sch = path.join(dir, 't.sch');
   const doc = path.join(dir, 'd.xml');
@@ -109,7 +109,7 @@ test('xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON },
   <p>ok</p>
   <p rend="x">much too long</p>
 </TEI>`);
-  const validator = path.resolve(__dirname, '..', '..', '..', 'xmlvalidate.py');
+  const validator = path.resolve(__dirname, '..', '..', '..', 'py-xmlvalidate.py');
   let stdout = '';
   try {
     execFileSync(process.env.VALIDATE_PYTHON!, [validator, '--json', '-s', sch, doc],
@@ -137,7 +137,7 @@ test('underline never yields an empty range', () => {
   assert.deepEqual(underline('  plain text', 40), [2, 12]);
 });
 
-test('downloadedUrl finds the URL xmlvalidate.py downloaded', () => {
+test('downloadedUrl finds the URL py-xmlvalidate.py downloaded', () => {
   assert.equal(downloadedUrl('[xml-model] esquema detectado: https://x/s.rng\n' +
                              '[descarga] https://x/s.rng\n[esquema] 3 patterns'), 'https://x/s.rng');
   assert.equal(downloadedUrl('[caché] https://x/s.rng ya descargado -> a-s.rng'), undefined);

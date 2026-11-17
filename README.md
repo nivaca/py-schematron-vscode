@@ -1,6 +1,6 @@
 # Schematron Validator for VS Code
 
-Validates XML/TEI documents against Schematron rules with `xmlvalidate.py`,
+Validates XML/TEI documents against Schematron rules with `py-xmlvalidate.py`,
 the program of [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate). It can also check
 RelaxNG structure with jing. Results appear as squiggles in the editor and in
 the Problems panel.
@@ -124,7 +124,7 @@ and Windows, but has not been tried there yet.
   `.xml` files that carry an `<?xml-model?>` processing instruction, or for
   any XML file when `schematron.schema` is set. You can also run
   **Schematron: Validate Current File** from the Command Palette.
-- **Schematron layer:** runs `xmlvalidate.py --json`. The schema is auto-detected
+- **Schematron layer:** runs `py-xmlvalidate.py --json`. The schema is auto-detected
   from `<?xml-model?>` (with the same download cache and classification as the
   command-line tool) or taken from your settings. Each failed `assert` or
   successful `report` becomes a diagnostic on the offending element's line.
@@ -156,9 +156,9 @@ and Windows, but has not been tried there yet.
 ## Validating against an ODD
 
 To take the rules from an **ODD** (`schematron.schemaType: "odd"`),
-`xmlvalidate.py` needs `odds/extract-isosch.xsl` and `common/functions.xsl`
+`py-xmlvalidate.py` needs `odds/extract-isosch.xsl` and `common/functions.xsl`
 from the [TEI Stylesheets](https://github.com/TEIC/Stylesheets) next to it.
-Set `schematron.validatorPath` to a copy of `xmlvalidate.py` that has them.
+Set `schematron.validatorPath` to a copy of `py-xmlvalidate.py` that has them.
 RelaxNG schemas and Schematron files need nothing extra.
 
 ## Settings
@@ -166,7 +166,7 @@ RelaxNG schemas and Schematron files need nothing extra.
 | Setting | Default | Meaning |
 |---|---|---|
 | `schematron.pythonPath` | `python3` | Interpreter with saxonche and lxml |
-| `schematron.validatorPath` | *(bundled)* | Path to `xmlvalidate.py` |
+| `schematron.validatorPath` | *(bundled)* | Path to `py-xmlvalidate.py` |
 | `schematron.schema` | *(auto)* | Schema file, relative to the workspace folder; empty = use `<?xml-model?>` |
 | `schematron.schemaType` | `rng` | Type of `schematron.schema`: `rng`, `sch` or `odd` |
 | `schematron.validateOnOpen` | `true` | Validate when a file is opened |
@@ -219,5 +219,5 @@ npx vsce package    # -> validate-schematron-<version>.vsix
 code --install-extension validate-schematron-<version>.vsix
 ```
 
-Packaging copies `../xmlvalidate.py` into the extension, so the `.vsix` works on
+Packaging copies `../py-xmlvalidate.py` into the extension, so the `.vsix` works on
 its own.
