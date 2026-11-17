@@ -167,7 +167,7 @@ function resolveSetting(doc: vscode.TextDocument, p: string): string {
 }
 
 /** Validates `doc` and shows the results. `refresh` re-downloads a remote
- *  schema first (validate.py --refresh). Returns validate.py's run, or
+ *  schema first (xmlvalidate.py --refresh). Returns xmlvalidate.py's run, or
  *  undefined when the document was skipped or a newer run superseded it. */
 async function validate(doc: vscode.TextDocument, manual: boolean,
                         refresh = false): Promise<RunResult | undefined> {
@@ -183,14 +183,14 @@ async function validate(doc: vscode.TextDocument, manual: boolean,
   const timeoutMs = (c.get<number>('timeoutSeconds') ?? 120) * 1000;
   const python = c.get<string>('pythonPath') || 'python3';
   const validator = resolveSetting(doc, c.get<string>('validatorPath') ?? '')
-    || path.join(extensionRoot, 'validator', 'validate.py');
+    || path.join(extensionRoot, 'validator', 'xmlvalidate.py');
   const schema = resolveSetting(doc, c.get<string>('schema') ?? '');
   const schemaFlag = { rng: '-r', sch: '-s', odd: '-o' }[c.get<string>('schemaType') ?? 'rng'] ?? '-r';
 
   setOutcome(key, { state: 'running' });
   let failedMessage: string | undefined;
   // Unsaved edits: validate the editor's text from a private temporary copy
-  // (never next to the user's file); --as makes validate.py resolve relative
+  // (never next to the user's file); --as makes xmlvalidate.py resolve relative
   // xml-model hrefs and report as if it were the real file.
   let tmpDir: string | undefined;
   let input = file;
@@ -230,7 +230,7 @@ async function validate(doc: vscode.TextDocument, manual: boolean,
     let relaxngRan = false;
     // On text that is not well-formed jing still runs: its errors before the
     // fatal one often pinpoint the typo ("element notde not allowed"); only
-    // its fatal error is dropped, as validate.py already reported it.
+    // its fatal error is dropped, as xmlvalidate.py already reported it.
     const malformed = parsed?.documents.some(d => d.error) ?? false;
     if (parsed?.source.type === 'rng' && c.get<boolean>('relaxng.enabled')) {
       const rItems = await relaxng(doc, parsed.source.path, input, cwd, key, timeoutMs, malformed);

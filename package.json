@@ -1,8 +1,8 @@
 {
   "name": "validate-schematron",
-  "displayName": "Schematron Validator (validate.py)",
+  "displayName": "Schematron Validator (xmlvalidate.py)",
   "description": "Validates XML/TEI documents against Schematron rules (from a .sch, an ODD or a RelaxNG with embedded rules) and, optionally, RelaxNG structure via jing, as you type. Requires Python 3 with the saxonche and lxml libraries: see 'Before you start'.",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "publisher": "NicolasVaughan",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -88,7 +88,7 @@
         "schematron.validatorPath": {
           "type": "string",
           "default": "",
-          "description": "Path to validate.py. Empty: use the copy bundled with the extension. Point it at your own checkout to use the ODD route (-o), which needs odds/extract-isosch.xsl next to the script.",
+          "description": "Path to xmlvalidate.py. Empty: use the copy bundled with the extension. Point it at your own checkout to use the ODD route (-o), which needs odds/extract-isosch.xsl next to the script.",
           "scope": "machine-overridable"
         },
         "schematron.schema": {

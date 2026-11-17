@@ -1,4 +1,4 @@
-// Pure parsing of validate.py --json and jing output into editor-neutral
+// Pure parsing of xmlvalidate.py --json and jing output into editor-neutral
 // diagnostic items. No dependency on the vscode API, so it can be unit-tested
 // with plain Node.
 
@@ -130,7 +130,7 @@ export function underline(text: string, col?: number): [number, number] {
 const JING_RE = /^(.*?):(\d+):(\d+): (error|warning|fatal): (.*)$/;
 
 /** `dropFatal`: leave out jing's fatal (well-formedness) errors, when
- *  validate.py has already reported the document as not well-formed. */
+ *  xmlvalidate.py has already reported the document as not well-formed. */
 export function itemsFromJing(output: string, file: string, dropFatal = false): Item[] {
   const target = path.resolve(file);
   const items: Item[] = [];
@@ -157,13 +157,13 @@ export interface Failure {
   interpreter: boolean;
 }
 
-/** URL that validate.py downloaded in this run ("[descarga] URL" on
+/** URL that xmlvalidate.py downloaded in this run ("[descarga] URL" on
  *  stderr), if any. */
 export function downloadedUrl(stderr: string): string | undefined {
   return /^\[descarga\] (\S+)/m.exec(stderr)?.[1];
 }
 
-/** Best explanation from validate.py's stderr when it produced no JSON
+/** Best explanation from xmlvalidate.py's stderr when it produced no JSON
  *  (environment errors, exit code 3). `python` is the interpreter used. */
 export function explainFailure(stderr: string, python: string): Failure {
   const mod = /No module named '?(saxonche|lxml)/.exec(stderr)?.[1];
@@ -178,5 +178,5 @@ export function explainFailure(stderr: string, python: string): Failure {
   const lines = stderr.split(/\r?\n/).map(l => l.trim())
     .filter(l => l && !/^\[(caché|descarga|xml-model|esquema|extracción|cosecha|aviso)\]/.test(l));
   return { interpreter: false,
-           message: lines.slice(-3).join(' ') || 'validate.py failed without a message.' };
+           message: lines.slice(-3).join(' ') || 'xmlvalidate.py failed without a message.' };
 }

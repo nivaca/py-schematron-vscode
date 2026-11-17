@@ -62,7 +62,7 @@ async function main() {
     PI.replace('href="schema.rng"', `href="http://127.0.0.1:${port}/remote.rng"`) +
     `\n<TEI xmlns="http://www.tei-c.org/ns/1.0">\n<p>a</p>\n<p>b</p>\n</TEI>\n`);
 
-  // validate.py caches downloads next to the bundled copy; start clean
+  // xmlvalidate.py caches downloads next to the bundled copy; start clean
   const cache = path.resolve(__dirname, '..', '..', '..', 'validator', '.schema-cache');
   fs.rmSync(cache, { recursive: true, force: true });
   // 1. well-formed; 3 p (Schematron) + <bogus/> (RelaxNG), on separate lines
