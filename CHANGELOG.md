@@ -6,6 +6,13 @@ changed. The releases, with their `.vsix` files, are on
 [Codeberg](https://codeberg.org/nivaca/py-xmlvalidate/releases) and
 [GitHub](https://github.com/nivaca/py-xmlvalidate/releases).
 
+## 0.5.12 — 2026-11-17 (py-xmlvalidate.py 1.16)
+
+- Faster again on large documents: py-xmlvalidate.py 1.16 evaluates each
+  rule in one call for all the elements it applies to, instead of one call
+  per element. A 26,000-line edition went from 11.5 s to 1.9 s (measured
+  back to back on the same machine). The results are the same.
+
 ## 0.5.11 — 2026-11-17 (py-xmlvalidate.py 1.15)
 
 - Faster checks of large documents: py-xmlvalidate.py 1.15 evaluates all
