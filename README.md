@@ -81,7 +81,7 @@ instruction pointing to its schema, as TEI files usually do. Within a
 second or two the status bar, at the bottom right, shows
 **✓ Schematron** (no problems) or **Schematron: 3** (three problems,
 underlined in the text). To try it on a ready-made example, download
-`py-xmlvalidate-v.*.zip` from the
+`py-xmlvalidate-v.*.zip` from py-xmlvalidate's
 [releases](https://github.com/nivaca/py-xmlvalidate/releases), unzip it, and
 open `docs/example/edition.xml`: it has six deliberate mistakes in its
 Schematron rules (and a seventh, structural one, if you install jing).
@@ -204,20 +204,24 @@ says so.
 ## License
 
 Copyright (C) 2026 Nicolas Vaughan. Free software under the GNU General
-Public License, version 3 or later; see [LICENSE](https://codeberg.org/nivaca/py-xmlvalidate/src/branch/main/LICENSE).
+Public License, version 3 or later; see [LICENSE](https://codeberg.org/nivaca/py-xmlvalidate-vscode/src/branch/main/LICENSE).
 
 ## Building
 
+From a clone of [py-xmlvalidate-vscode](https://codeberg.org/nivaca/py-xmlvalidate-vscode):
+
 ```sh
-cd vscode
 npm install
 npm test            # set VALIDATE_PYTHON=/path/to/python to include the end-to-end test
 # Real VS Code, headless (Linux), with a throwaway profile:
 env -u WAYLAND_DISPLAY VALIDATE_PYTHON=/path/to/python JING=$(command -v jing) \
   VSCODE_PATH=/usr/share/code/code xvfb-run -a npm run test:integration
-npx vsce package    # -> validate-schematron-<version>.vsix
-code --install-extension validate-schematron-<version>.vsix
+npm run package     # -> dist/validate-schematron-<version>.vsix
+code --install-extension dist/validate-schematron-<version>.vsix
 ```
 
-Packaging copies `../py-xmlvalidate.py` into the extension, so the `.vsix` works on
-its own.
+Packaging copies the repository's `py-xmlvalidate.py` into the extension
+(`validator/`), so the `.vsix` works on its own. That copy is kept in step
+with [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate), where
+the program is developed, by its `tools/sync-plugins.py`; the changelog says
+which version each release carries.

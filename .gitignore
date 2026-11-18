@@ -1,5 +1,11 @@
 node_modules/
 out/
 validator/
-LICENSE
-*.vsix
+*.vsix# packages (npx vsce package -o dist/)
+dist/
+# py-xmlvalidate.py run from here (tests) keeps its download cache next to it
+.schema-cache/
+*.harvested.sch
+__pycache__/
+# VS Code downloaded by the integration test
+.vscode-test/

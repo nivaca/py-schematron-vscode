@@ -2,7 +2,7 @@
   "name": "validate-schematron",
   "displayName": "Schematron Validator (py-xmlvalidate)",
   "description": "Validates XML/TEI documents against Schematron rules (from a .sch, an ODD or a RelaxNG with embedded rules) and, optionally, RelaxNG structure via jing, as you type. Requires Python 3 with the saxonche and lxml libraries: see 'Before you start'.",
-  "version": "0.5.12",
+  "version": "0.6.0",
   "publisher": "NicolasVaughan",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -12,7 +12,7 @@
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://codeberg.org/nivaca/py-xmlvalidate"
+    "url": "https://codeberg.org/nivaca/py-xmlvalidate-vscode"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -166,7 +166,7 @@
     "bundle-validator": "node scripts/bundle-validator.js",
     "vscode:prepublish": "npm run compile && npm run bundle-validator",
     "test": "npm run compile && node --test out/test/*.test.js",
-    "package": "vsce package",
+    "package": "node -e \"require('fs').mkdirSync('dist', {recursive: true})\" && vsce package -o dist/",
     "test:integration": "npm run compile && npm run bundle-validator && node out/test/integration/runTest.js"
   },
   "devDependencies": {
@@ -175,5 +175,9 @@
     "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "^4.1.0",
     "typescript": "^5.4.0"
-  }
+  },
+  "bugs": {
+    "url": "https://codeberg.org/nivaca/py-xmlvalidate-vscode/issues"
+  },
+  "homepage": "https://codeberg.org/nivaca/py-xmlvalidate-vscode"
 }

@@ -109,7 +109,7 @@ test('py-xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON
   <p>ok</p>
   <p rend="x">much too long</p>
 </TEI>`);
-  const validator = path.resolve(__dirname, '..', '..', '..', 'py-xmlvalidate.py');
+  const validator = path.resolve(__dirname, '..', '..', 'py-xmlvalidate.py');
   let stdout = '';
   try {
     execFileSync(process.env.VALIDATE_PYTHON!, [validator, '--json', '-s', sch, doc],
