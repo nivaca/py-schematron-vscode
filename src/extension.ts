@@ -4,13 +4,13 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
-  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate,
-  underline,
+  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY,
 } from './parse';
 
 let diagnostics: vscode.DiagnosticCollection;
 let output: vscode.OutputChannel;
 let extensionRoot: string;
+let extensionVersion = '?';
 
 /** Processes of the run in flight for each document, so a newer run can
  *  cancel an older one. */
@@ -49,6 +49,7 @@ const cfg = (doc: vscode.TextDocument) =>
 
 export function activate(context: vscode.ExtensionContext) {
   extensionRoot = context.extensionPath;
+  extensionVersion = context.extension.packageJSON.version ?? '?';
   diagnostics = vscode.languages.createDiagnosticCollection('schematron');
   output = vscode.window.createOutputChannel('Schematron');
   statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -69,6 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('schematron.selectInterpreter', chooseInterpreter),
     vscode.commands.registerCommand('schematron.refreshSchema', refreshSchema),
     vscode.commands.registerCommand('schematron.setupGuide', openSetupGuide),
+    vscode.commands.registerCommand('schematron.about', about),
     vscode.workspace.onDidOpenTextDocument(doc => {
       if (cfg(doc).get<boolean>('validateOnOpen')) { void validate(doc, false); }
     }),
@@ -393,6 +395,31 @@ async function chooseInterpreter() {
   await vscode.workspace.getConfiguration('schematron')
     .update('pythonPath', python, vscode.ConfigurationTarget.Global);
   vscode.window.showInformationMessage(`Schematron: using ${python}`);
+}
+
+/** Shows what the extension is (version, author, licence, repository) and
+ *  what its py-xmlvalidate.py says of itself (`--about`), in a dialog with
+ *  buttons to open the repository or copy the text. Returns the text (the
+ *  dialog is not awaited), for the tests. */
+async function about(): Promise<string> {
+  const c = vscode.workspace.getConfiguration('schematron');
+  const python = c.get<string>('pythonPath') || 'python3';
+  const validator = c.get<string>('validatorPath')
+    || path.join(extensionRoot, 'validator', 'py-xmlvalidate.py');
+  const r = await run(python, [validator, '--about'], os.homedir(), 'about', 30000);
+  const program = r.spawnError
+    ? `(The Python interpreter "${python}" could not be run: ` +
+      `${r.spawnError.code ?? r.spawnError.message}. See schematron.pythonPath.)`
+    : r.code === 0 ? r.stdout : `(${explainFailure(r.stderr, python).message})`;
+  const detail = aboutDetail(extensionVersion, program);
+  const open = 'Open Repository', copy = 'Copy Details';
+  void vscode.window.showInformationMessage(`Schematron Validator ${extensionVersion}`,
+                                            { modal: true, detail }, open, copy)
+    .then(pick => {
+      if (pick === open) { void vscode.env.openExternal(vscode.Uri.parse(REPOSITORY)); }
+      if (pick === copy) { void vscode.env.clipboard.writeText(detail); }
+    });
+  return detail;
 }
 
 function failure(message: string): Item {

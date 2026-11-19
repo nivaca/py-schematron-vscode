@@ -180,3 +180,25 @@ export function explainFailure(stderr: string, python: string): Failure {
   return { interpreter: false,
            message: lines.slice(-3).join(' ') || 'py-xmlvalidate.py failed without a message.' };
 }
+
+export const REPOSITORY = 'https://codeberg.org/nivaca/py-xmlvalidate-vscode';
+
+/** The text of the About command: the extension's version, author, licence
+ *  and repository, then what its py-xmlvalidate.py says of itself
+ *  (`--about`), or why that could not be run. */
+export function aboutDetail(version: string, program: string): string {
+  return [
+    `Schematron Validator for VS Code ${version}`,
+    '',
+    'Checks XML documents, TEI editions in particular, against the Schematron ' +
+      'rules of their schema as you type, and their RelaxNG structure with jing.',
+    '',
+    'Author: Nicolas Vaughan <nicolasvaughan@proton.me>',
+    'Licence: GNU General Public License, version 3 or later',
+    `Code: ${REPOSITORY}`,
+    '',
+    'Its py-xmlvalidate.py (--about):',
+    '',
+    program.trim(),
+  ].join('\n');
+}

@@ -131,6 +131,16 @@ export async function run(): Promise<void> {
     assert.equal(res?.status, 'local');
   });
 
+  await check('About shows the extension and its py-xmlvalidate.py', async () => {
+    const detail = await vscode.commands.executeCommand<string>('schematron.about');
+    const version = vscode.extensions.getExtension('NicolasVaughan.validate-schematron')!.packageJSON.version;
+    console.log(`    ${detail.split('\n')[0]} / ${detail.split('\n').find(l => l.startsWith('py-xmlvalidate.py'))}`);
+    assert.ok(detail.startsWith(`Schematron Validator for VS Code ${version}\n`));
+    assert.match(detail, /^py-xmlvalidate\.py \d+\.\d+$/m);
+    assert.ok(detail.includes('saxonche:'), 'the program\'s --about ran');
+    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  });
+
   for (const f of (process.env.SCHEMATRON_IT_EXTRA || '').split(':').filter(Boolean)) {
     await check(`extra document ${path.basename(f)} (diagnostics printed, not checked)`, async () => {
       const doc = await vscode.workspace.openTextDocument(f);

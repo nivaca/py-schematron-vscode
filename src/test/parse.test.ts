@@ -6,7 +6,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import {
   ValidateOutput, explainFailure, itemsFromJing, itemsFromMalformed, itemsFromValidate,
-  severityFor, underline, downloadedUrl,
+  severityFor, underline, downloadedUrl, aboutDetail, REPOSITORY,
 } from '../parse';
 
 test('severityFor maps Schematron roles', () => {
@@ -141,4 +141,14 @@ test('downloadedUrl finds the URL py-xmlvalidate.py downloaded', () => {
   assert.equal(downloadedUrl('[xml-model] esquema detectado: https://x/s.rng\n' +
                              '[descarga] https://x/s.rng\n[esquema] 3 patterns'), 'https://x/s.rng');
   assert.equal(downloadedUrl('[caché] https://x/s.rng ya descargado -> a-s.rng'), undefined);
+});
+
+test('aboutDetail: version, author, licence, repository and the program', () => {
+  const text = aboutDetail('9.9.9', 'py-xmlvalidate.py 1.2\nPython: 3.15\n');
+  const lines = text.split('\n');
+  assert.equal(lines[0], 'Schematron Validator for VS Code 9.9.9');
+  assert.ok(text.includes('Nicolas Vaughan <nicolasvaughan@proton.me>'));
+  assert.ok(text.includes('GNU General Public License, version 3 or later'));
+  assert.ok(text.includes(`Code: ${REPOSITORY}`));
+  assert.ok(text.endsWith('py-xmlvalidate.py 1.2\nPython: 3.15'));
 });

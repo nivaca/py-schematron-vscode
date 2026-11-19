@@ -194,6 +194,7 @@ Open the Command Palette (Ctrl+Shift+P) and type "Schematron":
 | Show Output | See exactly what ran and any error output |
 | Select Python Interpreter… | Choose the Python that has saxonche and lxml |
 | Clear Diagnostics | Remove all underlines and Problems entries |
+| About | See the extension's version, author, licence and repository, and what its `py-xmlvalidate.py` runs with (Python, saxonche, lxml); *Copy Details* puts it all on the clipboard, for a bug report |
 
 **About Refresh Schema:** a schema referenced by URL is downloaded once and
 then cached, so later changes to it (for example a new commit to the schema

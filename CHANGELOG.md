@@ -8,6 +8,13 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate/releases).
 
+## 0.7.0 — 2026-11-18 (py-xmlvalidate.py 1.19)
+
+- **Schematron: About** shows what the extension is (its version, author,
+  licence and repository) and what its `py-xmlvalidate.py` says of itself
+  (the program's new `--about`: its version, and the Python and libraries
+  it runs with), with buttons to open the repository or copy the details.
+
 ## 0.6.1 — 2026-11-18 (py-xmlvalidate.py 1.18)
 
 - Carries py-xmlvalidate.py 1.18: variables (`<let>`) declared at schema or
