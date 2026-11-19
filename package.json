@@ -82,6 +82,11 @@
         "command": "schematron.about",
         "title": "About",
         "category": "Schematron"
+      },
+      {
+        "command": "schematron.goToRule",
+        "title": "Go to Rule",
+        "category": "Schematron"
       }
     ],
     "menus": {

@@ -15,6 +15,19 @@ export interface Item {
   severity: Severity;
   source: 'Schematron' | 'RelaxNG' | 'XML';
   code?: string;
+  /** Where the rules behind it are, with a label for each (Schematron). */
+  rules?: RuleLink[];
+}
+
+/** Where an assert or report is written (since py-xmlvalidate.py 1.21): in
+ *  the ODD or RelaxNG it came from, the file one edits. Line is 1-based. */
+export interface RuleLocation { file: string; line: number | null }
+
+export interface RuleLink extends RuleLocation { label: string }
+
+/** The label of a link to a rule: "The rule: smed-schema.xml, line 186". */
+export function ruleLabel(rule: RuleLocation, what = 'The rule'): string {
+  return `${what}: ${path.basename(rule.file)}` + (rule.line ? `, line ${rule.line}` : '');
 }
 
 export interface Violation {
@@ -27,6 +40,7 @@ export interface Violation {
   path: string;
   line: number | null;
   xml_id: string | null;
+  rule?: RuleLocation;                // (since 1.21)
 }
 
 export interface XPathError {
@@ -34,6 +48,7 @@ export interface XPathError {
   context: string;
   error: string;
   nodes: number;
+  rule?: RuleLocation;                // (since 1.21)
 }
 
 export interface DocumentResult {
@@ -105,6 +120,7 @@ export function itemsFromValidate(out: ValidateOutput, file: string): Item[] {
     severity: severityFor(v.role),
     source: 'Schematron' as const,
     code: v.pattern || undefined,
+    ...(v.rule?.file ? { rules: [{ ...v.rule, label: ruleLabel(v.rule) }] } : {}),
   }));
   const errs = doc.xpath_errors ?? [];
   if (errs.length) {
@@ -116,6 +132,8 @@ export function itemsFromValidate(out: ValidateOutput, file: string): Item[] {
       severity: 'warning',
       source: 'Schematron',
       message: `${errs.length} rule(s) failed to evaluate; the verdict is incomplete.\n${detail}`,
+      rules: errs.filter(e => e.rule?.file).map(e => ({
+        ...e.rule!, label: ruleLabel(e.rule!, `Failed: ${e.message || e.context}`) })),
     });
   }
   return items;

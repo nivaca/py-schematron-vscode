@@ -79,6 +79,28 @@ export async function run(): Promise<void> {
     assertVisible(ds);
   });
 
+  await check('Go to Rule opens schema.rng at the assert behind the error', async () => {
+    const doc = await open('invalid.xml');
+    const ds = await waitFor(doc.uri, d => d.some(x => x.source === 'Schematron'), 'the Schematron error');
+    const err = ds.find(d => d.source === 'Schematron')!;
+    const rel = err.relatedInformation ?? [];
+    assert.equal(rel.length, 1);
+    assert.match(rel[0].message, /^The rule: schema\.rng, line \d+$/);
+    // the lightbulb offers it too
+    const actions = await vscode.commands.executeCommand<vscode.CodeAction[]>(
+      'vscode.executeCodeActionProvider', doc.uri, err.range);
+    assert.ok(actions.some(a => a.command?.command === 'schematron.goToRule'));
+    // the command, with the cursor on the error
+    vscode.window.activeTextEditor!.selection = new vscode.Selection(err.range.start, err.range.start);
+    const at = await vscode.commands.executeCommand<vscode.Location>('schematron.goToRule');
+    const shown = vscode.window.activeTextEditor!;
+    assert.equal(path.basename(shown.document.uri.fsPath), 'schema.rng');
+    assert.equal(shown.selection.active.line, at.range.start.line);
+    assert.match(shown.document.lineAt(at.range.start.line).text, /<sch:assert/);
+    console.log(`    ${rel[0].message}: ${shown.document.lineAt(at.range.start.line).text.trim().slice(0, 60)}`);
+    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  });
+
   await check('typo.xml (not well-formed): the error points at the typo', async () => {
     const doc = await open('typo.xml');
     const ds = await waitFor(doc.uri, d => d.length > 0, 'a well-formedness diagnostic');

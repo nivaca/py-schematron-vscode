@@ -15,6 +15,12 @@ changed. The releases, with their `.vsix` files, are on
   **Refresh Schema** learns of a download from the report's events. With
   an older `py-xmlvalidate.py` (named in `schematron.validatorPath`),
   stderr is still read as before.
+- **Go to Rule.** Each Schematron error links to the assert or report
+  that reported it, in the ODD or RelaxNG it came from (the file you edit,
+  not the `.sch` made from it): under the error, in the hover and in the
+  Problems panel. **Schematron: Go to Rule** and the lightbulb open it for
+  the error under the cursor. A rule that failed to evaluate is linked the
+  same way. Needs py-xmlvalidate.py 1.21, which says where each rule is.
 - The tests run on GitHub every Monday too.
 
 ## 0.8.0 — 2026-11-18 (py-xmlvalidate.py 1.20)

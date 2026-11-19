@@ -71,6 +71,8 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('schematron.refreshSchema', refreshSchema),
     vscode.commands.registerCommand('schematron.setupGuide', openSetupGuide),
     vscode.commands.registerCommand('schematron.about', about),
+    vscode.commands.registerCommand('schematron.goToRule', goToRule),
+    vscode.languages.registerCodeActionsProvider({ language: 'xml' }, ruleActions),
     vscode.workspace.onDidOpenTextDocument(doc => {
       if (cfg(doc).get<boolean>('validateOnOpen')) { void validate(doc, false); }
     }),
@@ -444,5 +446,53 @@ function toDiagnostic(doc: vscode.TextDocument, i: Item): vscode.Diagnostic {
   const d = new vscode.Diagnostic(range, i.message, SEVERITY[i.severity]);
   d.source = i.source;
   if (i.code) { d.code = i.code; }
+  if (i.rules?.length) {
+    d.relatedInformation = i.rules.map(r => new vscode.DiagnosticRelatedInformation(
+      new vscode.Location(vscode.Uri.file(r.file), new vscode.Position(Math.max((r.line ?? 1) - 1, 0), 0)),
+      r.label));
+  }
   return d;
 }
+
+/** The rules behind the Schematron diagnostics at a position: the related
+ *  locations this extension gave them. */
+function rulesAt(uri: vscode.Uri, pos: vscode.Position): vscode.DiagnosticRelatedInformation[] {
+  return (diagnostics.get(uri) ?? [])
+    .filter(d => d.source === 'Schematron' && d.range.contains(pos))
+    .flatMap(d => d.relatedInformation ?? []);
+}
+
+/** Opens the schema at the rule of the Schematron error under the cursor
+ *  (or, with several, the one picked). Returns the location opened, for
+ *  the tests. */
+async function goToRule(target?: vscode.Location): Promise<vscode.Location | undefined> {
+  if (!target) {
+    const editor = vscode.window.activeTextEditor;
+    const found = editor ? rulesAt(editor.document.uri, editor.selection.active) : [];
+    if (!found.length) {
+      vscode.window.showInformationMessage(
+        'Schematron: there is no Schematron error with a known rule under the cursor.');
+      return undefined;
+    }
+    const pick = found.length === 1 ? found[0] : (await vscode.window.showQuickPick(
+      found.map(r => ({ label: r.message, r })), { placeHolder: 'Which rule?' }))?.r;
+    if (!pick) { return undefined; }
+    target = pick.location;
+  }
+  const shown = await vscode.window.showTextDocument(target.uri, { preview: true });
+  shown.selection = new vscode.Selection(target.range.start, target.range.start);
+  shown.revealRange(target.range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+  return target;
+}
+
+/** The lightbulb: "Go to the rule (smed-schema.xml, line 186)". */
+const ruleActions: vscode.CodeActionProvider = {
+  provideCodeActions(doc, range) {
+    return rulesAt(doc.uri, range.start).map(r => {
+      const a = new vscode.CodeAction(`Go to ${r.message.replace(/^The rule: /, 'the rule: ')}`,
+                                      vscode.CodeActionKind.Empty);
+      a.command = { command: 'schematron.goToRule', title: a.title, arguments: [r.location] };
+      return a;
+    });
+  },
+};

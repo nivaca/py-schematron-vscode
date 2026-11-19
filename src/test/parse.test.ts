@@ -121,8 +121,25 @@ test('py-xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON
   const items = itemsFromValidate(JSON.parse(stdout), doc);
   // <name/> gives the element name; value-of on an attribute gives its value,
   // with the surrounding quotes kept tight.
+  // ...and the rule's location: line 4 of t.sch, its assert
   assert.deepEqual(items, [{ line: 2, message: 'p too long: 13, rend="x"', severity: 'warning',
-                             source: 'Schematron', code: 'len' }]);
+                             source: 'Schematron', code: 'len',
+                             rules: [{ file: sch, line: 4, label: 'The rule: t.sch, line 4' }] }]);
+});
+
+test('itemsFromValidate links rules, and keeps working without them (before 1.21)', () => {
+  const base = { version: '1.21', schema: 's', source: { path: 'p', type: 'rng' as const } };
+  const v = { pattern: 'p1', context: 'tei:p', type: 'assert' as const, role: '', message: 'm',
+              text: 'm', path: '/x', line: 3, xml_id: null };
+  const rule = { file: '/s/smed-schema.xml', line: 186 };
+  const [linked] = itemsFromValidate({ ...base, documents: [{ file: 'd.xml', violations: [{ ...v, rule }] }] }, 'd.xml');
+  assert.deepEqual(linked.rules, [{ ...rule, label: 'The rule: smed-schema.xml, line 186' }]);
+  const [plain] = itemsFromValidate({ ...base, documents: [{ file: 'd.xml', violations: [v] }] }, 'd.xml');
+  assert.equal(plain.rules, undefined);
+  const items = itemsFromValidate({ ...base, documents: [{ file: 'd.xml', violations: [], xpath_errors: [
+    { message: 'broken', context: 'tei:p', error: 'XPTY0004', nodes: 2, rule },
+    { message: '', context: 'tei:q', error: 'XPST0008', nodes: 1 }] }] }, 'd.xml');
+  assert.deepEqual(items[0].rules, [{ ...rule, label: 'Failed: broken: smed-schema.xml, line 186' }]);
 });
 
 test('underline never yields an empty range', () => {

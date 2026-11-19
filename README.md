@@ -203,6 +203,7 @@ Open the Command Palette (Ctrl+Shift+P) and type "Schematron":
 | Refresh Schema | Re-download the active file's schema after it changed upstream, then re-validate the open files |
 | Show Output | See exactly what ran and any error output |
 | Select Python Interpreter… | Choose the Python that has saxonche and lxml |
+| Go to Rule | Open the schema at the rule behind the Schematron error under the cursor: the assert or report, in the ODD or RelaxNG you edit. The same link is under each error, in the hover and in the Problems panel, and in the lightbulb |
 | Clear Diagnostics | Remove all underlines and Problems entries |
 | About | See the extension's version, author, licence and repository, and what its `py-xmlvalidate.py` runs with (Python, saxonche, lxml); *Copy Details* puts it all on the clipboard, for a bug report |
 
