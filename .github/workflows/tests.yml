@@ -9,6 +9,10 @@ on:
     branches: ["**"]
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Mondays: catches what changes upstream with no push here (the TEI
+    # Stylesheets' dev branch, new saxonche or lxml, Emacs, Flycheck, npm)
+    - cron: "30 6 * * 1"
 
 permissions:
   contents: read
