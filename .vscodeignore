@@ -16,3 +16,4 @@ py-schematron.py
 .github/**
 dist/**
 tools/**
+docs/**
