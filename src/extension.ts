@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
-  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY, parseOutput, installerPython, choosePython,
+  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY, parseOutput, installerPython, choosePython, jingCommand,
 } from './parse';
 
 let diagnostics: vscode.DiagnosticCollection;
@@ -308,13 +308,14 @@ function updateStatus() {
 async function relaxng(doc: vscode.TextDocument, rng: string, file: string,
                        cwd: string, key: string, timeoutMs: number,
                        dropFatal = false): Promise<Item[] | null> {
-  const jing = cfg(doc).get<string>('jingPath') || 'jing';
-  const r = await run(jing, [rng, file], cwd, key, timeoutMs);
+  const [jing, ...first] = jingCommand(cfg(doc).get<string>('jingPath'), process.env);
+  const r = await run(jing, [...first, rng, file], cwd, key, timeoutMs);
   if (r.spawnError) {
     if (!jingMissingLogged) {
       jingMissingLogged = true;
-      output.appendLine(`jing not found (${jing}); RelaxNG layer skipped. ` +
-        `Install jing, set schematron.jingPath, or disable schematron.relaxng.enabled.`);
+      output.appendLine(`jing not found (${[jing, ...first].join(' ')}); RelaxNG layer skipped. ` +
+        `Install jing, or set schematron.jingPath to jing or to a jing.jar (with Java), ` +
+        `or disable schematron.relaxng.enabled.`);
     }
     return null;                                    // layer did not run
   }

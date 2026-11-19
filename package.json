@@ -2,7 +2,7 @@
   "name": "validate-schematron",
   "displayName": "Schematron Validator (py-schematron)",
   "description": "Validates XML/TEI documents against Schematron rules (from a .sch, an ODD or a RelaxNG with embedded rules) and, optionally, RelaxNG structure via jing, as you type. Requires Python 3 with the saxonche and lxml libraries: see 'Before you start'.",
-  "version": "0.11.1",
+  "version": "0.12.0",
   "publisher": "NicolasVaughan",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -171,8 +171,8 @@
         },
         "schematron.jingPath": {
           "type": "string",
-          "default": "jing",
-          "description": "jing executable for the RelaxNG layer.",
+          "default": "",
+          "description": "jing for the RelaxNG layer: a command, or a jing.jar, which is run with Java (java -jar), as on Windows, which has no jing command. Empty: $JING, or the jing.jar named by $JING_JAR, or jing.",
           "scope": "machine-overridable"
         },
         "schematron.timeoutSeconds": {

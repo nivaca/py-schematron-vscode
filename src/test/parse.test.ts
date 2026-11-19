@@ -7,7 +7,7 @@ import * as path from 'node:path';
 import {
   ValidateOutput, explainFailure, itemsFromJing, itemsFromMalformed, itemsFromValidate,
   severityFor, underline, downloadedUrl, aboutDetail, REPOSITORY, parseOutput,
-  installerPython, choosePython,
+  installerPython, choosePython, jingCommand,
 } from '../parse';
 
 test('severityFor maps Schematron roles', () => {
@@ -218,5 +218,13 @@ test('choosePython: the setting, else the installer\'s, else python3', () => {
   assert.equal(choosePython('', '/inst/python', yes, 'linux'), '/inst/python');
   assert.equal(choosePython(undefined, '/inst/python', no, 'linux'), 'python3');
   assert.equal(choosePython('', 'C:\\inst\\python.exe', no, 'win32'), 'python');
+});
+
+test('jingCommand: the setting (a .jar with Java), else $JING, $JING_JAR, jing', () => {
+  assert.deepEqual(jingCommand('/usr/bin/jing', { JING_JAR: '/x.jar' }), ['/usr/bin/jing']);
+  assert.deepEqual(jingCommand('C:\\jing\\bin\\jing.jar', {}), ['java', '-jar', 'C:\\jing\\bin\\jing.jar']);
+  assert.deepEqual(jingCommand('', { JING: '/opt/jing', JING_JAR: '/x.jar' }), ['/opt/jing']);
+  assert.deepEqual(jingCommand(undefined, { JING_JAR: '/x/jing.jar' }), ['java', '-jar', '/x/jing.jar']);
+  assert.deepEqual(jingCommand('', {}), ['jing']);
 });
 

@@ -121,11 +121,13 @@ elements may appear where), install **jing**, which needs Java:
 - **Debian, Ubuntu:** `sudo apt install jing`
 - **macOS:** `brew install jing-trang` (with [Homebrew](https://brew.sh))
 - **Other Linux systems:** download `jing` from
-  <https://github.com/relaxng/jing-trang/releases>, unzip it, and make a
-  small script called `jing` that runs `exec java -jar /path/to/jing.jar "$@"`
-  (make it executable with `chmod +x`). Set `schematron.jingPath` to that
-  script.
-- **Windows:** not supported yet; the Schematron checks work without it.
+  <https://github.com/relaxng/jing-trang/releases>, unzip it, and set
+  `schematron.jingPath` to its `jing.jar`, which the extension runs with
+  Java (`java -jar`).
+- **Windows:** install Java (`winget install EclipseAdoptium.Temurin.21.JRE`),
+  download `jing` from <https://github.com/relaxng/jing-trang/releases>,
+  unzip it, and set `schematron.jingPath` to its `jing.jar`, for example
+  `C:\Tools\jing\bin\jing.jar`.
 
 Without jing, the extension simply skips the structural checks.
 
@@ -200,7 +202,7 @@ RelaxNG schemas and Schematron files need nothing extra.
 | `schematron.validateOnChange` | `true` | Validate as you type, including unsaved changes |
 | `schematron.changeDelayMs` | `500` | How long typing must pause before validating (ms, minimum 100) |
 | `schematron.relaxng.enabled` | `true` | Run jing when the schema is RelaxNG |
-| `schematron.jingPath` | `jing` | jing executable |
+| `schematron.jingPath` | *(empty)* | jing: a command, or a `jing.jar`, run with Java; empty: `$JING`, the `jing.jar` named by `$JING_JAR`, or `jing` |
 | `schematron.timeoutSeconds` | `120` | Abort a run after this long |
 
 Changing any `schematron.*` setting re-validates the open files.

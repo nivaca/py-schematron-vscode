@@ -279,3 +279,17 @@ export function choosePython(setting: string | undefined, installer: string,
   return platform === 'win32' ? 'python' : 'python3';
 }
 
+/** The command line that runs jing, as [program, ...first arguments]:
+ *  schematron.jingPath (a .jar is run with `java -jar`); or else, when it is
+ *  empty, $JING, or the jing.jar named by $JING_JAR (with Java), or the
+ *  `jing` command. Windows has no `jing` command: a jing.jar and Java are
+ *  how jing runs there. */
+export function jingCommand(setting: string | undefined,
+                            env: Record<string, string | undefined>): string[] {
+  const jar = (p: string) => /\.jar$/i.test(p);
+  if (setting) { return jar(setting) ? ['java', '-jar', setting] : [setting]; }
+  if (env.JING) { return [env.JING]; }
+  if (env.JING_JAR) { return ['java', '-jar', env.JING_JAR]; }
+  return ['jing'];
+}
+
