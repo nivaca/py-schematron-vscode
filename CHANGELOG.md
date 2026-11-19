@@ -8,6 +8,14 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate/releases).
 
+## 0.6.1 — 2026-11-18 (py-xmlvalidate.py 1.18)
+
+- Carries py-xmlvalidate.py 1.18: variables (`<let>`) declared at schema or
+  pattern level are evaluated with the document's root as context, as ISO
+  Schematron says, and a rule that cannot be evaluated makes the program
+  exit 3. The extension shows the same problems as before; schemas with
+  variables at those levels now get the standard behaviour.
+
 ## 0.6.0 — 2026-11-18 (py-xmlvalidate.py 1.17)
 
 - The extension has a repository of its own, py-xmlvalidate-vscode, which
