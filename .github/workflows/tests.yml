@@ -1,6 +1,9 @@
-# Compiles the extension and runs its unit tests on every push and pull
-# request. (publish-vscode.yml runs them too, on release tags, before it
-# publishes.)
+# Compiles the extension and runs its unit tests, and runs it inside a real
+# VS Code, on every push and pull request: on Linux and Windows, and also on
+# macOS for release tags, the Monday run and runs started by hand (GitHub
+# often has no Mac free, and then cancels the job after a long wait, which
+# fails the whole run for nothing). (publish-vscode.yml runs the unit tests
+# too, on release tags, before it publishes.)
 
 name: Tests
 
@@ -11,7 +14,7 @@ on:
   workflow_dispatch:
   schedule:
     # Mondays: catches what changes upstream with no push here (the TEI
-    # Stylesheets' dev branch, new saxonche or lxml, Emacs, Flycheck, npm)
+    # Stylesheets' dev branch, new saxonche or lxml, VS Code, npm)
     - cron: "30 6 * * 1"
 
 permissions:
@@ -19,7 +22,14 @@ permissions:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')) && '["ubuntu-latest", "macos-latest", "windows-latest"]' || '["ubuntu-latest", "windows-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
 
@@ -38,7 +48,19 @@ jobs:
           npm ci
           python -m pip install saxonche lxml
 
-      - name: Test
+      - name: Unit tests
         run: |
           export VALIDATE_PYTHON="$(command -v python)"
           npm test
+
+      - name: In a real VS Code (Linux, under Xvfb)
+        if: runner.os == 'Linux'
+        run: |
+          export VALIDATE_PYTHON="$(command -v python)"
+          xvfb-run -a npm run test:integration
+
+      - name: In a real VS Code (macOS, Windows)
+        if: runner.os != 'Linux'
+        run: |
+          export VALIDATE_PYTHON="$(command -v python)"
+          npm run test:integration

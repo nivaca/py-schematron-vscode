@@ -125,7 +125,10 @@ test('py-schematron.py --json round trip', { skip: !process.env.VALIDATE_PYTHON 
   // ...and the rule's location: line 4 of t.sch, its assert
   assert.deepEqual(items, [{ line: 2, message: 'p too long: 13, rend="x"', severity: 'warning',
                              source: 'Schematron', code: 'len',
-                             rules: [{ file: sch, line: 4, label: 'The rule: t.sch, line 4' }] }]);
+                             // (the program resolves the path: on Windows the
+                             // temporary folder's short name gets its long one)
+                             rules: [{ file: fs.realpathSync.native(sch), line: 4,
+                                       label: 'The rule: t.sch, line 4' }] }]);
 });
 
 test('itemsFromValidate links rules, and keeps working without them (before 1.21)', () => {
@@ -198,10 +201,13 @@ test('downloadedUrl: from the events, or from stderr for an older script', () =>
 });
 
 test('installerPython: where the installer puts its Python, on each system', () => {
-  assert.equal(installerPython('linux', '/home/a', {}), '/home/a/.local/share/py-schematron/venv/bin/python');
-  assert.equal(installerPython('linux', '/home/a', { XDG_DATA_HOME: '/d' }), '/d/py-schematron/venv/bin/python');
+  // (path.join of the system running the tests, as the extension uses it)
+  assert.equal(installerPython('linux', '/home/a', {}),
+               path.join('/home/a', '.local', 'share', 'py-schematron', 'venv', 'bin', 'python'));
+  assert.equal(installerPython('linux', '/home/a', { XDG_DATA_HOME: '/d' }),
+               path.join('/d', 'py-schematron', 'venv', 'bin', 'python'));
   assert.equal(installerPython('darwin', '/Users/a', {}),
-               '/Users/a/Library/Application Support/py-schematron/venv/bin/python');
+               path.join('/Users/a', 'Library', 'Application Support', 'py-schematron', 'venv', 'bin', 'python'));
   assert.ok(installerPython('win32', 'C:\\Users\\a', { LOCALAPPDATA: 'C:\\Users\\a\\AppData\\Local' })
     .endsWith(path.join('py-schematron', 'venv', 'Scripts', 'python.exe')));
 });

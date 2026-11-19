@@ -8,6 +8,13 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-schematron](https://codeberg.org/nivaca/py-schematron/releases).
 
+## 0.11.1 — 2026-11-19 (py-schematron.py 2.2)
+
+- The tests run on GitHub on Windows too at every push, and on macOS for
+  each release, besides Linux: the unit tests and the extension inside a
+  real VS Code. Two unit tests no longer assume Unix paths.
+- Carries py-schematron.py 2.2.
+
 ## 0.11.0 — 2026-11-19 (py-schematron.py 2.1)
 
 - **No Python to set up by hand.** py-schematron 2.1 has an installer for
