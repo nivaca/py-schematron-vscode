@@ -45,11 +45,39 @@ export interface DocumentResult {
   error_line?: number | null;
 }
 
+/** What py-xmlvalidate.py did on the way (since 1.21): a download, a cached
+ *  copy, the extraction or harvest of the rules... `kind` and the data are
+ *  stable; `message` is the program's own text (in Spanish). */
+export interface ProgramEvent {
+  kind: 'cache' | 'download' | 'xml-model' | 'schema' | 'extraction' | 'harvest' | 'warning' | string;
+  message: string;
+  url?: string;
+  file?: string;
+  [key: string]: unknown;
+}
+
 export interface ValidateOutput {
   version: string;
   schema: string;
   source: { path: string; type: 'rng' | 'sch' | 'odd' };
   documents: DocumentResult[];
+  events?: ProgramEvent[];            // (absent before 1.21)
+}
+
+/** py-xmlvalidate.py's stdout with --json: a report, or (since 1.21) a fatal
+ *  error with its message; undefined when it is neither (no JSON at all, as
+ *  when Python itself fails, or an older script's error). */
+export function parseOutput(stdout: string):
+    { report: ValidateOutput } | { error: string; events: ProgramEvent[] } | undefined {
+  let d: unknown;
+  try { d = JSON.parse(stdout); } catch { return undefined; }
+  if (!d || typeof d !== 'object') { return undefined; }
+  const o = d as Record<string, unknown>;
+  if (Array.isArray(o.documents)) { return { report: o as unknown as ValidateOutput }; }
+  if (typeof o.error === 'string') {
+    return { error: o.error, events: Array.isArray(o.events) ? o.events as ProgramEvent[] : [] };
+  }
+  return undefined;
 }
 
 /** Schematron `role` wins when it names a level; otherwise every failed
@@ -157,9 +185,13 @@ export interface Failure {
   interpreter: boolean;
 }
 
-/** URL that py-xmlvalidate.py downloaded in this run ("[descarga] URL" on
- *  stderr), if any. */
-export function downloadedUrl(stderr: string): string | undefined {
+/** URL that py-xmlvalidate.py downloaded in this run, if any: from the
+ *  report's events, or, from a script older than 1.21, which has none, from
+ *  its "[descarga] URL" line on stderr. */
+export function downloadedUrl(report: ValidateOutput | undefined, stderr: string): string | undefined {
+  if (report?.events) {
+    return report.events.find(e => e.kind === 'download')?.url;
+  }
   return /^\[descarga\] (\S+)/m.exec(stderr)?.[1];
 }
 

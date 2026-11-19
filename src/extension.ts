@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
-  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY,
+  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY, parseOutput,
 } from './parse';
 
 let diagnostics: vscode.DiagnosticCollection;
@@ -218,10 +218,14 @@ async function validate(doc: vscode.TextDocument, manual: boolean,
       failedMessage = msg;
       void notifyInterpreter(msg);
     } else {
-      try {
-        parsed = JSON.parse(r.stdout) as ValidateOutput;
+      const out = parseOutput(r.stdout);
+      if (out && 'report' in out) {
+        parsed = out.report;
         items = itemsFromValidate(parsed, file);
-      } catch {
+      } else if (out) {                              // its own fatal error
+        items = [failure(out.error)];
+        failedMessage = out.error;
+      } else {
         const f = explainFailure(r.stderr, python);
         items = [failure(f.message)];
         failedMessage = f.message;
@@ -332,12 +336,13 @@ async function refreshSchema(): Promise<RefreshResult> {
   const r = await vscode.window.withProgress(
     { location: vscode.ProgressLocation.Notification, title: `Schematron: refreshing the schema of ${name}…` },
     () => validate(doc, true, true));
-  if (!r || r.spawnError || !r.stdout.trim().startsWith('{')) {
+  const out = r && !r.spawnError ? parseOutput(r.stdout) : undefined;
+  if (!r || !out || !('report' in out)) {
     vscode.window.showErrorMessage(
       'Schematron: the schema could not be refreshed. See the status bar or Schematron: Show Output.');
     return { status: 'failed' };
   }
-  const url = downloadedUrl(r.stderr);
+  const url = downloadedUrl(out.report, r.stderr);
   if (!url) {
     vscode.window.showInformationMessage(
       `Schematron: the schema of ${name} is a local file, so there is nothing to download; ` +

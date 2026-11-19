@@ -8,6 +8,15 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate/releases).
 
+## 0.9.0 — 2026-11-19 (py-xmlvalidate.py 1.21)
+
+- The extension no longer reads the program's Spanish messages on stderr:
+  the program's fatal errors come from its JSON, word for word, and
+  **Refresh Schema** learns of a download from the report's events. With
+  an older `py-xmlvalidate.py` (named in `schematron.validatorPath`),
+  stderr is still read as before.
+- The tests run on GitHub every Monday too.
+
 ## 0.8.0 — 2026-11-18 (py-xmlvalidate.py 1.20)
 
 - **Restricted Mode.** The extension declares what it does in a folder that

@@ -6,7 +6,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import {
   ValidateOutput, explainFailure, itemsFromJing, itemsFromMalformed, itemsFromValidate,
-  severityFor, underline, downloadedUrl, aboutDetail, REPOSITORY,
+  severityFor, underline, downloadedUrl, aboutDetail, REPOSITORY, parseOutput,
 } from '../parse';
 
 test('severityFor maps Schematron roles', () => {
@@ -137,10 +137,10 @@ test('underline never yields an empty range', () => {
   assert.deepEqual(underline('  plain text', 40), [2, 12]);
 });
 
-test('downloadedUrl finds the URL py-xmlvalidate.py downloaded', () => {
-  assert.equal(downloadedUrl('[xml-model] esquema detectado: https://x/s.rng\n' +
+test('downloadedUrl reads an older script\'s stderr', () => {
+  assert.equal(downloadedUrl(undefined, '[xml-model] esquema detectado: https://x/s.rng\n' +
                              '[descarga] https://x/s.rng\n[esquema] 3 patterns'), 'https://x/s.rng');
-  assert.equal(downloadedUrl('[caché] https://x/s.rng ya descargado -> a-s.rng'), undefined);
+  assert.equal(downloadedUrl(undefined, '[caché] https://x/s.rng ya descargado -> a-s.rng'), undefined);
 });
 
 test('aboutDetail: version, author, licence, repository and the program', () => {
@@ -151,4 +151,30 @@ test('aboutDetail: version, author, licence, repository and the program', () => 
   assert.ok(text.includes('GNU General Public License, version 3 or later'));
   assert.ok(text.includes(`Code: ${REPOSITORY}`));
   assert.ok(text.endsWith('py-xmlvalidate.py 1.2\nPython: 3.15'));
+});
+
+test('parseOutput: a report, a fatal error, or neither', () => {
+  const report = parseOutput(JSON.stringify(
+    { version: '1.21', schema: 's', source: { path: 'p', type: 'rng' }, documents: [], events: [] }));
+  assert.ok(report && 'report' in report);
+  const error = parseOutput(JSON.stringify(
+    { version: '1.21', error: 'd.xml no lleva ninguna PI', events: [{ kind: 'warning', message: 'w' }] }));
+  assert.deepEqual(error, { error: 'd.xml no lleva ninguna PI', events: [{ kind: 'warning', message: 'w' }] });
+  assert.equal(parseOutput(''), undefined);
+  assert.equal(parseOutput('Traceback (most recent call last):'), undefined);
+  assert.equal(parseOutput('[1, 2]'), undefined);
+});
+
+test('downloadedUrl: from the events, or from stderr for an older script', () => {
+  const base = { version: '1.21', schema: 's', source: { path: 'p', type: 'rng' as const }, documents: [] };
+  const url = 'https://example.org/s.rng';
+  assert.equal(downloadedUrl({ ...base, events: [
+    { kind: 'xml-model', message: 'm', href: url },
+    { kind: 'download', message: url, url, file: '/c/x-s.rng' }] }, ''), url);
+  // events without a download: nothing was downloaded, whatever stderr says
+  assert.equal(downloadedUrl({ ...base, events: [{ kind: 'cache', message: 'm', url }] },
+                             `[descarga] ${url}`), undefined);
+  // an older script: no events, so stderr
+  assert.equal(downloadedUrl({ ...base }, `[xml-model] x\n[descarga] ${url}\n`), url);
+  assert.equal(downloadedUrl(undefined, ''), undefined);
 });
