@@ -55,10 +55,12 @@ import time
 import urllib.request
 from urllib.parse import urlparse
 from collections import Counter
+from concurrent.futures import ProcessPoolExecutor
+from contextlib import ExitStack
 from copy import deepcopy
 from pathlib import Path
 
-# Python 3.15 o posterior (como pide pyproject.toml). Se comprueba antes de
+# Python 3.15 o posterior (como dicen el README y los instaladores). Se comprueba antes de
 # importar lxml y saxonche, para que con un Python más antiguo el mensaje
 # sea claro: error de entorno, código 3 (la extensión de VS Code lo muestra).
 if sys.version_info < (3, 15):
@@ -69,7 +71,7 @@ if sys.version_info < (3, 15):
 from lxml import etree
 from saxonche import PySaxonProcessor
 
-__version__ = "2.2"
+__version__ = "2.6"
 
 SCH_NS = 'http://purl.oclc.org/dsdl/schematron'
 S = f'{{{SCH_NS}}}'
@@ -404,7 +406,7 @@ def detectar_esquema(doc_path: Path, refresh=False, base_dir: Path = None):
 # ---------------------------------------------------------------- esquema
 
 def leer_lets(el):
-    return [(l.get('name'), l.get('value')) for l in el.findall(S + 'let')]
+    return [(let.get('name'), let.get('value')) for let in el.findall(S + 'let')]
 
 
 def espacios(texto):
@@ -571,6 +573,25 @@ class DocumentoMalFormado(Exception):
     def __init__(self, msg, line=None):
         super().__init__(msg)
         self.line = line
+
+
+# --jobs: cada proceso trabajador tiene su propio Saxon y una copia de las
+# reglas ya leídas (un PySaxonProcessor no se comparte entre hilos).
+_TRABAJADOR = {}
+
+
+def _iniciar_trabajador(nss, patterns):
+    _TRABAJADOR.update(proc=PySaxonProcessor(license=False), nss=nss, patterns=patterns)
+
+
+def _validar_en_trabajador(doc: str, n_lineas):
+    """Valida DOC en un proceso trabajador: ('ok', resultado) o ('mal',
+    mensaje, línea) si no está bien formado."""
+    try:
+        return ('ok', validar(Path(doc), _TRABAJADOR['nss'], _TRABAJADOR['patterns'],
+                              _TRABAJADOR['proc'], n_lineas=n_lineas))
+    except DocumentoMalFormado as e:
+        return ('mal', str(e), e.line)
 
 
 def ubicar_en_fuente(patterns, fuente: Path):
@@ -749,8 +770,8 @@ def validar(doc_path: Path, nss, patterns, proc, n_lineas=None, nombre=None):
         'file': str(doc_path),
         'violations': infracciones,
         'xpath_errors': [{'message': m, 'context': c, 'error': e, 'nodes': n,
-                          'rule': {'file': f, 'line': l}}
-                         for (m, c, e, f, l), n in errores.items()],
+                          'rule': {'file': f, 'line': linea}}
+                         for (m, c, e, f, linea), n in errores.items()],
         'seconds': round(segundos, 3),
     }
 
@@ -855,6 +876,10 @@ def main():
     ap.add_argument('--max', type=int, default=50,
                     help='máximo de infracciones detalladas (def. 50; '
                          'el recuento total nunca se trunca)')
+    ap.add_argument('--jobs', type=int, default=1, metavar='N',
+                    help='con varios documentos: validar N a la vez, en procesos '
+                         'aparte (0: tantos como procesadores); el informe sale '
+                         'en el orden de siempre')
     ap.add_argument('--refresh', action='store_true',
                     help='con autodetección por xml-model: volver a '
                          'descargar el esquema aunque esté en caché')
@@ -904,24 +929,41 @@ def main():
                          f"prefijos: {', '.join(nss)}",
                file=Path(sch).resolve(), patterns=len(patterns), rules=n_reglas,
                prefixes=list(nss))
-        for d in args.docs:
-            try:
-                res = validar(d, nss, patterns, proc,
-                              n_lineas=None if args.json else
-                              (args.max if args.verbose else 0),
-                              nombre=nombre)
-            except DocumentoMalFormado as e:
+        n_lineas = None if args.json else (args.max if args.verbose else 0)
+
+        def uno_a_uno():
+            for d in args.docs:
+                try:
+                    yield 'ok', validar(d, nss, patterns, proc, n_lineas=n_lineas, nombre=nombre)
+                except DocumentoMalFormado as e:
+                    yield 'mal', str(e), e.line
+
+        trabajos = args.jobs or os.cpu_count() or 1
+        with ExitStack() as pila:
+            if trabajos > 1 and len(args.docs) > 1:
+                # los documentos se reparten entre procesos; los resultados
+                # vuelven en el orden de los documentos
+                grupo = pila.enter_context(ProcessPoolExecutor(
+                    max_workers=min(trabajos, len(args.docs)),
+                    initializer=_iniciar_trabajador, initargs=(nss, patterns)))
+                salidas = grupo.map(_validar_en_trabajador, [str(d) for d in args.docs],
+                                    [n_lineas] * len(args.docs))
+            else:
+                salidas = uno_a_uno()
+            for d, salida in zip(args.docs, salidas):
+                if salida[0] == 'mal':
+                    if not args.json:
+                        morir(salida[1])
+                    mal_formados += 1
+                    resultados.append({'file': str(args.como or d), 'error': salida[1],
+                                       'error_line': salida[2]})
+                    continue
+                res = salida[1]
+                if args.como:
+                    res['file'] = str(args.como)
+                resultados.append(res)
                 if not args.json:
-                    morir(str(e))
-                mal_formados += 1
-                resultados.append({'file': str(args.como or d), 'error': str(e),
-                                   'error_line': e.line})
-                continue
-            if args.como:
-                res['file'] = str(args.como)
-            resultados.append(res)
-            if not args.json:
-                informe_texto(res, args.verbose, args.max)
+                    informe_texto(res, args.verbose, args.max)
     if args.json:
         json.dump({'version': __version__, 'schema': str(sch),
                    'source': {'path': str(Path(fuente).resolve()),
