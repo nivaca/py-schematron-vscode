@@ -93,9 +93,9 @@ test('explainFailure: other errors keep the last meaningful lines', () => {
     { interpreter: false, message: 'No existe el documento: /x.xml' });
 });
 
-// End-to-end against the real py-xmlvalidate.py, when VALIDATE_PYTHON points at an
+// End-to-end against the real py-schematron.py, when VALIDATE_PYTHON points at an
 // interpreter with saxonche (skipped otherwise).
-test('py-xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON }, () => {
+test('py-schematron.py --json round trip', { skip: !process.env.VALIDATE_PYTHON }, () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sch-'));
   const sch = path.join(dir, 't.sch');
   const doc = path.join(dir, 'd.xml');
@@ -109,7 +109,7 @@ test('py-xmlvalidate.py --json round trip', { skip: !process.env.VALIDATE_PYTHON
   <p>ok</p>
   <p rend="x">much too long</p>
 </TEI>`);
-  const validator = path.resolve(__dirname, '..', '..', 'py-xmlvalidate.py');
+  const validator = path.resolve(__dirname, '..', '..', 'py-schematron.py');
   let stdout = '';
   try {
     execFileSync(process.env.VALIDATE_PYTHON!, [validator, '--json', '-s', sch, doc],
@@ -161,13 +161,13 @@ test('downloadedUrl reads an older script\'s stderr', () => {
 });
 
 test('aboutDetail: version, author, licence, repository and the program', () => {
-  const text = aboutDetail('9.9.9', 'py-xmlvalidate.py 1.2\nPython: 3.15\n');
+  const text = aboutDetail('9.9.9', 'py-schematron.py 1.2\nPython: 3.15\n');
   const lines = text.split('\n');
   assert.equal(lines[0], 'Schematron Validator for VS Code 9.9.9');
   assert.ok(text.includes('Nicolas Vaughan <nicolasvaughan@proton.me>'));
   assert.ok(text.includes('GNU General Public License, version 3 or later'));
   assert.ok(text.includes(`Code: ${REPOSITORY}`));
-  assert.ok(text.endsWith('py-xmlvalidate.py 1.2\nPython: 3.15'));
+  assert.ok(text.endsWith('py-schematron.py 1.2\nPython: 3.15'));
 });
 
 test('parseOutput: a report, a fatal error, or neither', () => {

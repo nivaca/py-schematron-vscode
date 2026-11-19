@@ -11,8 +11,8 @@ node_modules/**
 # documents kept here for manual testing never belong in the package
 **/*.xml
 images/*.svg
-# the bundled copy is validator/py-xmlvalidate.py
-py-xmlvalidate.py
+# the bundled copy is validator/py-schematron.py
+py-schematron.py
 .github/**
 dist/**
 tools/**

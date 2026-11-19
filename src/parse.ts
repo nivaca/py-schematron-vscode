@@ -1,4 +1,4 @@
-// Pure parsing of py-xmlvalidate.py --json and jing output into editor-neutral
+// Pure parsing of py-schematron.py --json and jing output into editor-neutral
 // diagnostic items. No dependency on the vscode API, so it can be unit-tested
 // with plain Node.
 
@@ -19,7 +19,7 @@ export interface Item {
   rules?: RuleLink[];
 }
 
-/** Where an assert or report is written (since py-xmlvalidate.py 1.21): in
+/** Where an assert or report is written (since py-schematron.py 1.21): in
  *  the ODD or RelaxNG it came from, the file one edits. Line is 1-based. */
 export interface RuleLocation { file: string; line: number | null }
 
@@ -60,7 +60,7 @@ export interface DocumentResult {
   error_line?: number | null;
 }
 
-/** What py-xmlvalidate.py did on the way (since 1.21): a download, a cached
+/** What py-schematron.py did on the way (since 1.21): a download, a cached
  *  copy, the extraction or harvest of the rules... `kind` and the data are
  *  stable; `message` is the program's own text (in Spanish). */
 export interface ProgramEvent {
@@ -79,7 +79,7 @@ export interface ValidateOutput {
   events?: ProgramEvent[];            // (absent before 1.21)
 }
 
-/** py-xmlvalidate.py's stdout with --json: a report, or (since 1.21) a fatal
+/** py-schematron.py's stdout with --json: a report, or (since 1.21) a fatal
  *  error with its message; undefined when it is neither (no JSON at all, as
  *  when Python itself fails, or an older script's error). */
 export function parseOutput(stdout: string):
@@ -176,7 +176,7 @@ export function underline(text: string, col?: number): [number, number] {
 const JING_RE = /^(.*?):(\d+):(\d+): (error|warning|fatal): (.*)$/;
 
 /** `dropFatal`: leave out jing's fatal (well-formedness) errors, when
- *  py-xmlvalidate.py has already reported the document as not well-formed. */
+ *  py-schematron.py has already reported the document as not well-formed. */
 export function itemsFromJing(output: string, file: string, dropFatal = false): Item[] {
   const target = path.resolve(file);
   const items: Item[] = [];
@@ -203,7 +203,7 @@ export interface Failure {
   interpreter: boolean;
 }
 
-/** URL that py-xmlvalidate.py downloaded in this run, if any: from the
+/** URL that py-schematron.py downloaded in this run, if any: from the
  *  report's events, or, from a script older than 1.21, which has none, from
  *  its "[descarga] URL" line on stderr. */
 export function downloadedUrl(report: ValidateOutput | undefined, stderr: string): string | undefined {
@@ -213,7 +213,7 @@ export function downloadedUrl(report: ValidateOutput | undefined, stderr: string
   return /^\[descarga\] (\S+)/m.exec(stderr)?.[1];
 }
 
-/** Best explanation from py-xmlvalidate.py's stderr when it produced no JSON
+/** Best explanation from py-schematron.py's stderr when it produced no JSON
  *  (environment errors, exit code 3). `python` is the interpreter used. */
 export function explainFailure(stderr: string, python: string): Failure {
   const mod = /No module named '?(saxonche|lxml)/.exec(stderr)?.[1];
@@ -228,13 +228,13 @@ export function explainFailure(stderr: string, python: string): Failure {
   const lines = stderr.split(/\r?\n/).map(l => l.trim())
     .filter(l => l && !/^\[(caché|descarga|xml-model|esquema|extracción|cosecha|aviso)\]/.test(l));
   return { interpreter: false,
-           message: lines.slice(-3).join(' ') || 'py-xmlvalidate.py failed without a message.' };
+           message: lines.slice(-3).join(' ') || 'py-schematron.py failed without a message.' };
 }
 
-export const REPOSITORY = 'https://codeberg.org/nivaca/py-xmlvalidate-vscode';
+export const REPOSITORY = 'https://codeberg.org/nivaca/py-schematron-vscode';
 
 /** The text of the About command: the extension's version, author, licence
- *  and repository, then what its py-xmlvalidate.py says of itself
+ *  and repository, then what its py-schematron.py says of itself
  *  (`--about`), or why that could not be run. */
 export function aboutDetail(version: string, program: string): string {
   return [
@@ -247,7 +247,7 @@ export function aboutDetail(version: string, program: string): string {
     'Licence: GNU General Public License, version 3 or later',
     `Code: ${REPOSITORY}`,
     '',
-    'Its py-xmlvalidate.py (--about):',
+    'Its py-schematron.py (--about):',
     '',
     program.trim(),
   ].join('\n');

@@ -1,11 +1,11 @@
 # Schematron Validator for VS Code
 
-Validates XML/TEI documents against Schematron rules with `py-xmlvalidate.py`,
-the program of [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate). It can also check
+Validates XML/TEI documents against Schematron rules with `py-schematron.py`,
+the program of [py-schematron](https://codeberg.org/nivaca/py-schematron). It can also check
 RelaxNG structure with jing. Results appear as squiggles in the editor and in
 the Problems panel.
 
-![The extension on a TEI document: errors underlined, the message of one, the Problems panel and the count in the status bar](https://codeberg.org/nivaca/py-xmlvalidate/raw/branch/main/docs/img/vscode_dark.png)
+![The extension on a TEI document: errors underlined, the message of one, the Problems panel and the count in the status bar](https://codeberg.org/nivaca/py-schematron/raw/branch/main/docs/img/vscode_dark.png)
 
 ## Before you start
 
@@ -81,8 +81,8 @@ instruction pointing to its schema, as TEI files usually do. Within a
 second or two the status bar, at the bottom right, shows
 **✓ Schematron** (no problems) or **Schematron: 3** (three problems,
 underlined in the text). To try it on a ready-made example, download
-`py-xmlvalidate-v.*.zip` from py-xmlvalidate's
-[releases](https://github.com/nivaca/py-xmlvalidate/releases), unzip it, and
+`py-schematron-v.*.zip` from py-schematron's
+[releases](https://github.com/nivaca/py-schematron/releases), unzip it, and
 open `docs/example/edition.xml`: it has six deliberate mistakes in its
 Schematron rules (and a seventh, structural one, if you install jing).
 
@@ -124,7 +124,7 @@ and Windows, but has not been tried there yet.
   `.xml` files that carry an `<?xml-model?>` processing instruction, or for
   any XML file when `schematron.schema` is set. You can also run
   **Schematron: Validate Current File** from the Command Palette.
-- **Schematron layer:** runs `py-xmlvalidate.py --json`. The schema is auto-detected
+- **Schematron layer:** runs `py-schematron.py --json`. The schema is auto-detected
   from `<?xml-model?>` (with the same download cache and classification as the
   command-line tool) or taken from your settings. Each failed `assert` or
   successful `report` becomes a diagnostic on the offending element's line.
@@ -156,9 +156,9 @@ and Windows, but has not been tried there yet.
 ## Validating against an ODD
 
 To take the rules from an **ODD** (`schematron.schemaType: "odd"`),
-`py-xmlvalidate.py` needs `odds/extract-isosch.xsl` and `common/functions.xsl`
+`py-schematron.py` needs `odds/extract-isosch.xsl` and `common/functions.xsl`
 from the [TEI Stylesheets](https://github.com/TEIC/Stylesheets) next to it.
-Set `schematron.validatorPath` to a copy of `py-xmlvalidate.py` that has them.
+Set `schematron.validatorPath` to a copy of `py-schematron.py` that has them.
 RelaxNG schemas and Schematron files need nothing extra.
 
 ## Settings
@@ -166,7 +166,7 @@ RelaxNG schemas and Schematron files need nothing extra.
 | Setting | Default | Meaning |
 |---|---|---|
 | `schematron.pythonPath` | `python3` | Interpreter with saxonche and lxml |
-| `schematron.validatorPath` | *(bundled)* | Path to `py-xmlvalidate.py` |
+| `schematron.validatorPath` | *(bundled)* | Path to `py-schematron.py` |
 | `schematron.schema` | *(auto)* | Schema file, relative to the workspace folder; empty = use `<?xml-model?>` |
 | `schematron.schemaType` | `rng` | Type of `schematron.schema`: `rng`, `sch` or `odd` |
 | `schematron.validateOnOpen` | `true` | Validate when a file is opened |
@@ -205,7 +205,7 @@ Open the Command Palette (Ctrl+Shift+P) and type "Schematron":
 | Select Python Interpreter… | Choose the Python that has saxonche and lxml |
 | Go to Rule | Open the schema at the rule behind the Schematron error under the cursor: the assert or report, in the ODD or RelaxNG you edit. The same link is under each error, in the hover and in the Problems panel, and in the lightbulb |
 | Clear Diagnostics | Remove all underlines and Problems entries |
-| About | See the extension's version, author, licence and repository, and what its `py-xmlvalidate.py` runs with (Python, saxonche, lxml); *Copy Details* puts it all on the clipboard, for a bug report |
+| About | See the extension's version, author, licence and repository, and what its `py-schematron.py` runs with (Python, saxonche, lxml); *Copy Details* puts it all on the clipboard, for a bug report |
 
 **About Refresh Schema:** a schema referenced by URL is downloaded once and
 then cached, so later changes to it (for example a new commit to the schema
@@ -216,11 +216,11 @@ says so.
 ## License
 
 Copyright (C) 2026 Nicolas Vaughan. Free software under the GNU General
-Public License, version 3 or later; see [LICENSE](https://codeberg.org/nivaca/py-xmlvalidate-vscode/src/branch/main/LICENSE).
+Public License, version 3 or later; see [LICENSE](https://codeberg.org/nivaca/py-schematron-vscode/src/branch/main/LICENSE).
 
 ## Building
 
-From a clone of [py-xmlvalidate-vscode](https://codeberg.org/nivaca/py-xmlvalidate-vscode):
+From a clone of [py-schematron-vscode](https://codeberg.org/nivaca/py-schematron-vscode):
 
 ```sh
 npm install
@@ -232,8 +232,8 @@ npm run package     # -> dist/validate-schematron-<version>.vsix
 code --install-extension dist/validate-schematron-<version>.vsix
 ```
 
-Packaging copies the repository's `py-xmlvalidate.py` into the extension
+Packaging copies the repository's `py-schematron.py` into the extension
 (`validator/`), so the `.vsix` works on its own. That copy is kept in step
-with [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate), where
+with [py-schematron](https://codeberg.org/nivaca/py-schematron), where
 the program is developed, by its `tools/sync-plugins.py`; the changelog says
 which version each release carries.
