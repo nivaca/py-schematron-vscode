@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import {
-  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY, parseOutput,
+  Item, ValidateOutput, downloadedUrl, explainFailure, itemsFromJing, itemsFromValidate, underline, aboutDetail, REPOSITORY, parseOutput, installerPython, choosePython,
 } from './parse';
 
 let diagnostics: vscode.DiagnosticCollection;
@@ -43,6 +43,12 @@ function clearChangeTimer(key: string) {
 }
 
 interface RunResult { code: number | null; stdout: string; stderr: string; spawnError?: NodeJS.ErrnoException }
+
+/** The Python that runs py-schematron.py: schematron.pythonPath, or else
+ *  the one py-schematron's installer made, or else python3. */
+const pythonOf = (c: vscode.WorkspaceConfiguration) =>
+  choosePython(c.get<string>('pythonPath'), installerPython(process.platform, os.homedir(), process.env),
+               fs.existsSync, process.platform);
 
 const cfg = (doc: vscode.TextDocument) =>
   vscode.workspace.getConfiguration('schematron', doc.uri);
@@ -185,7 +191,7 @@ async function validate(doc: vscode.TextDocument, manual: boolean,
   const file = doc.uri.fsPath;
   const cwd = path.dirname(file);
   const timeoutMs = (c.get<number>('timeoutSeconds') ?? 120) * 1000;
-  const python = c.get<string>('pythonPath') || 'python3';
+  const python = pythonOf(c);
   const validator = resolveSetting(doc, c.get<string>('validatorPath') ?? '')
     || path.join(extensionRoot, 'validator', 'py-schematron.py');
   const schema = resolveSetting(doc, c.get<string>('schema') ?? '');
@@ -214,8 +220,9 @@ async function validate(doc: vscode.TextDocument, manual: boolean,
     let parsed: ValidateOutput | undefined;
     if (r.spawnError) {
       const msg = `Could not run the Python interpreter "${python}" ` +
-        `(${r.spawnError.code ?? r.spawnError.message}). Set schematron.pythonPath ` +
-        `to a Python that has saxonche and lxml.`;
+        `(${r.spawnError.code ?? r.spawnError.message}). Install py-schematron with its ` +
+        `installer, which the extension then finds by itself (Schematron: Setup Guide), ` +
+        `or set schematron.pythonPath to a Python that has saxonche and lxml.`;
       items = [failure(msg)];
       failedMessage = msg;
       void notifyInterpreter(msg);
@@ -410,7 +417,7 @@ async function chooseInterpreter() {
  *  dialog is not awaited), for the tests. */
 async function about(): Promise<string> {
   const c = vscode.workspace.getConfiguration('schematron');
-  const python = c.get<string>('pythonPath') || 'python3';
+  const python = pythonOf(c);
   const validator = c.get<string>('validatorPath')
     || path.join(extensionRoot, 'validator', 'py-schematron.py');
   const r = await run(python, [validator, '--about'], os.homedir(), 'about', 30000);

@@ -12,7 +12,8 @@ the Problems panel.
 > **This extension needs Python on your computer, with two extra Python
 > libraries: `saxonche` and `lxml`.** VS Code does not install them for you.
 > Without them the extension cannot check anything, and the status bar shows
-> *Schematron: failed*. Setting them up takes about five minutes, once.
+> *Schematron: failed*. py-schematron's installer sets them up with one
+> command (step 2), and the extension then finds them by itself.
 
 ### 1. Check that Python is installed
 
@@ -26,17 +27,44 @@ Open a terminal. In VS Code: menu **Terminal → New Terminal**. Then type:
 If you get an error such as *command not found*, install Python first:
 
 - **Windows and macOS:** download it from <https://www.python.org/downloads/>
-  and run the installer. On Windows, tick **"Add python.exe to PATH"** on
-  the installer's first screen.
-- **Linux:** use your system's packages, e.g. `sudo apt install python3
-  python3-venv` (Debian, Ubuntu) or `sudo dnf install python3` (Fedora).
+  and run the installer (or `winget install Python.Python.3.15` on Windows,
+  `brew install python@3.15` on macOS).
+- **Linux:** use your system's packages, e.g. `sudo apt install python3.15
+  python3.15-venv` (Debian, Ubuntu) or `sudo dnf install python3.15`
+  (Fedora).
 
 Then close the terminal, open a new one, and check again.
 
-### 2. Install the two libraries
+### 2. Install the libraries with py-schematron's installer
 
-They go into a folder of their own, a *virtual environment*, so that they
-don't interfere with anything else on your computer. (Recent Linux and
+py-schematron's installer makes a Python environment of its own with
+saxonche and lxml, in your user folders, without administrator rights. In
+VS Code's terminal, type:
+
+**Linux and macOS:**
+
+```sh
+curl -LsSf https://raw.githubusercontent.com/nivaca/py-schematron/main/installers/install.sh | sh
+```
+
+**Windows** (VS Code's terminal uses PowerShell):
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://raw.githubusercontent.com/nivaca/py-schematron/main/installers/install.ps1 | iex"
+```
+
+It ends with *py-schematron … is installed in …*. That is all: while
+`schematron.pythonPath` is empty, as it is at first, the extension uses
+the installer's Python by itself. (The installer also gives you the
+`py-schematron` command for the terminal; py-schematron's
+[README](https://codeberg.org/nivaca/py-schematron#21-with-the-installer-linux-macos-windows)
+explains it in detail, and how to update or remove it.)
+
+### 3. Or install them by hand, instead
+
+Skip this if you used the installer. To manage the Python yourself, put the
+two libraries into a folder of their own, a *virtual environment*, so that
+they don't interfere with anything else on your computer. (Recent Linux and
 macOS systems refuse `pip install` outside one, with an
 *externally-managed-environment* error.) Copy these two lines into the
 terminal, one at a time:
@@ -58,11 +86,9 @@ py -m venv $HOME\.venvs\schematron
 The second line downloads the libraries; it ends with *Successfully
 installed … lxml … saxonche …*.
 
-### 3. Tell the extension which Python to use
-
-Open the Command Palette (**Ctrl+Shift+P**, or **Cmd+Shift+P** on macOS),
+**Then tell the extension which Python to use.** Open the Command Palette (**Ctrl+Shift+P**, or **Cmd+Shift+P** on macOS),
 type **Schematron: Select Python Interpreter…** and press Enter. A file
-picker opens in the `.venvs` folder made in step 2. Go into `schematron`
+picker opens in the `.venvs` folder made above. Go into `schematron`
 and choose:
 
 | System | The file to choose |
@@ -107,9 +133,9 @@ Without jing, the extension simply skips the structural checks.
 
 | What you see | What to do |
 |---|---|
-| *The Python interpreter "…" does not have the 'saxonche' module* | Step 2 was skipped or went into another Python: do step 2, then step 3. The notification's **Setup Guide** button opens these instructions. |
-| *Could not run the Python interpreter "…"* | The path in step 3 is wrong; run **Schematron: Select Python Interpreter…** again. |
-| *externally-managed-environment* when running `pip` | Use the commands of step 2 exactly: they install into the virtual environment. |
+| *The Python interpreter "…" does not have the 'saxonche' module* | Step 2 was skipped, or `schematron.pythonPath` names another Python: run the installer (step 2) and empty that setting. The notification's **Setup Guide** button opens these instructions. |
+| *Could not run the Python interpreter "…"* | The path in `schematron.pythonPath` is wrong: empty it to use the installer's Python, or run **Schematron: Select Python Interpreter…** again. |
+| *externally-managed-environment* when running `pip` | Use the installer (step 2), or the commands of step 3 exactly: both install into an environment of their own. |
 | Nothing at all happens in an XML file | The file has no `<?xml-model?>` line, so the extension does not know its schema: add one, set `schematron.schema`, or run **Schematron: Validate Current File**. |
 | VS Code on Linux installed as a Flatpak or Snap | It cannot see the Python on your system. Install VS Code from its `.rpm` or `.deb` package instead. |
 | Anything else | Run **Schematron: Show Output**: it shows each command the extension ran and the full error. |
@@ -165,7 +191,7 @@ RelaxNG schemas and Schematron files need nothing extra.
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `schematron.pythonPath` | `python3` | Interpreter with saxonche and lxml |
+| `schematron.pythonPath` | *(empty)* | Interpreter with saxonche and lxml; empty: the one py-schematron's installer made, if it is installed, or else `python3` |
 | `schematron.validatorPath` | *(bundled)* | Path to `py-schematron.py` |
 | `schematron.schema` | *(auto)* | Schema file, relative to the workspace folder; empty = use `<?xml-model?>` |
 | `schematron.schemaType` | `rng` | Type of `schematron.schema`: `rng`, `sch` or `odd` |

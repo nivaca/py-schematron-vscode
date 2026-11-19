@@ -8,6 +8,18 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-schematron](https://codeberg.org/nivaca/py-schematron/releases).
 
+## 0.11.0 — 2026-11-19 (py-schematron.py 2.1)
+
+- **No Python to set up by hand.** py-schematron 2.1 has an installer for
+  Linux, macOS and Windows that makes a Python environment with saxonche
+  and lxml. While `schematron.pythonPath` is empty, now its default, the
+  extension uses that environment's Python if it is installed, and
+  `python3` otherwise. A path already set keeps working as before.
+- The setup steps (*Before you start*) start with the installer; the
+  manual virtual environment remains as an alternative. The error
+  messages about Python point to the installer too.
+- Carries py-schematron.py 2.1.
+
 ## 0.10.0 — 2026-11-19 (py-schematron.py 2.0)
 
 - The program behind the extension is renamed **py-schematron** (it was

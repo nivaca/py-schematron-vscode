@@ -7,6 +7,7 @@ import * as path from 'node:path';
 import {
   ValidateOutput, explainFailure, itemsFromJing, itemsFromMalformed, itemsFromValidate,
   severityFor, underline, downloadedUrl, aboutDetail, REPOSITORY, parseOutput,
+  installerPython, choosePython,
 } from '../parse';
 
 test('severityFor maps Schematron roles', () => {
@@ -195,3 +196,21 @@ test('downloadedUrl: from the events, or from stderr for an older script', () =>
   assert.equal(downloadedUrl({ ...base }, `[xml-model] x\n[descarga] ${url}\n`), url);
   assert.equal(downloadedUrl(undefined, ''), undefined);
 });
+
+test('installerPython: where the installer puts its Python, on each system', () => {
+  assert.equal(installerPython('linux', '/home/a', {}), '/home/a/.local/share/py-schematron/venv/bin/python');
+  assert.equal(installerPython('linux', '/home/a', { XDG_DATA_HOME: '/d' }), '/d/py-schematron/venv/bin/python');
+  assert.equal(installerPython('darwin', '/Users/a', {}),
+               '/Users/a/Library/Application Support/py-schematron/venv/bin/python');
+  assert.ok(installerPython('win32', 'C:\\Users\\a', { LOCALAPPDATA: 'C:\\Users\\a\\AppData\\Local' })
+    .endsWith(path.join('py-schematron', 'venv', 'Scripts', 'python.exe')));
+});
+
+test('choosePython: the setting, else the installer\'s, else python3', () => {
+  const yes = () => true, no = () => false;
+  assert.equal(choosePython('/my/python', '/inst/python', yes, 'linux'), '/my/python');
+  assert.equal(choosePython('', '/inst/python', yes, 'linux'), '/inst/python');
+  assert.equal(choosePython(undefined, '/inst/python', no, 'linux'), 'python3');
+  assert.equal(choosePython('', 'C:\\inst\\python.exe', no, 'win32'), 'python');
+});
+

@@ -2,7 +2,7 @@
   "name": "validate-schematron",
   "displayName": "Schematron Validator (py-schematron)",
   "description": "Validates XML/TEI documents against Schematron rules (from a .sch, an ODD or a RelaxNG with embedded rules) and, optionally, RelaxNG structure via jing, as you type. Requires Python 3 with the saxonche and lxml libraries: see 'Before you start'.",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "publisher": "NicolasVaughan",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -106,8 +106,8 @@
       "properties": {
         "schematron.pythonPath": {
           "type": "string",
-          "default": "python3",
-          "description": "Python interpreter that has the saxonche and lxml libraries, e.g. ~/.venvs/schematron/bin/python (Linux, macOS) or %USERPROFILE%\\.venvs\\schematron\\Scripts\\python.exe (Windows). The easiest way to set it is the command 'Schematron: Select Python Interpreter…'; 'Schematron: Setup Guide' explains how to install the libraries.",
+          "default": "",
+          "description": "Python interpreter that has the saxonche and lxml libraries. Leave it empty to use the one made by py-schematron's installer, if it is installed (see 'Schematron: Setup Guide'), or else python3. Otherwise, for example ~/.venvs/schematron/bin/python (Linux, macOS) or %USERPROFILE%\\.venvs\\schematron\\Scripts\\python.exe (Windows); the command 'Schematron: Select Python Interpreter…' sets it.",
           "scope": "machine-overridable"
         },
         "schematron.validatorPath": {

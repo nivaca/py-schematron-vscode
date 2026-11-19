@@ -221,8 +221,10 @@ export function explainFailure(stderr: string, python: string): Failure {
     return {
       interpreter: true,
       message: `The Python interpreter "${python}" does not have the '${mod}' module. ` +
-        `Choose an interpreter that has saxonche and lxml (schematron.pythonPath), ` +
-        `or install them into this one: "${python}" -m pip install saxonche lxml`,
+        `The easiest fix is py-schematron's installer, which the extension then finds by ` +
+        `itself (Schematron: Setup Guide). Or choose an interpreter that has saxonche and ` +
+        `lxml (schematron.pythonPath), or install them into this one: ` +
+        `"${python}" -m pip install saxonche lxml`,
     };
   }
   const lines = stderr.split(/\r?\n/).map(l => l.trim())
@@ -252,3 +254,28 @@ export function aboutDetail(version: string, program: string): string {
     program.trim(),
   ].join('\n');
 }
+
+/** Where py-schematron's installer puts its Python (installers/install.py
+ *  in py-schematron): an environment that has saxonche and lxml. */
+export function installerPython(platform: string, home: string,
+                                env: Record<string, string | undefined>): string {
+  if (platform === 'win32') {
+    return path.join(env.LOCALAPPDATA || path.join(home, 'AppData', 'Local'),
+                     'py-schematron', 'venv', 'Scripts', 'python.exe');
+  }
+  if (platform === 'darwin') {
+    return path.join(home, 'Library', 'Application Support', 'py-schematron', 'venv', 'bin', 'python');
+  }
+  return path.join(env.XDG_DATA_HOME || path.join(home, '.local', 'share'),
+                   'py-schematron', 'venv', 'bin', 'python');
+}
+
+/** The Python to run: the setting; or else the installer's, if it exists;
+ *  or else python3 (python on Windows). */
+export function choosePython(setting: string | undefined, installer: string,
+                             exists: (p: string) => boolean, platform: string): string {
+  if (setting) { return setting; }
+  if (exists(installer)) { return installer; }
+  return platform === 'win32' ? 'python' : 'python3';
+}
+
