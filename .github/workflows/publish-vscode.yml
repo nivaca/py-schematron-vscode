@@ -13,8 +13,15 @@
 # It runs when a release tag (v*) is pushed, or by hand from the Actions tab.
 # A version already on the Marketplace is skipped.
 #
-# Optional: to publish to Open VSX too (the store of VSCodium), add a
-# repository secret OVSX_PAT with an access token from https://open-vsx.org.
+# Optional: to publish to Open VSX too (the store of VSCodium and other
+# editors built on VS Code's code):
+#   1. Sign in at https://open-vsx.org with GitHub, and sign the Eclipse
+#      Foundation's publisher agreement there (Settings > Profile).
+#   2. Settings > Access Tokens: create a token.
+#   3. On GitHub, Settings > Secrets and variables > Actions > Secrets:
+#      add OVSX_PAT with that token.
+# The first run creates the namespace NicolasVaughan on Open VSX. To publish
+# a version already tagged, run this workflow by hand on its tag.
 
 name: Publish VS Code extension
 
@@ -65,4 +72,9 @@ jobs:
 
       - name: Publish to Open VSX
         if: env.OVSX_PAT != ''
-        run: npx --yes ovsx publish extension.vsix --skip-duplicate
+        run: |
+          publisher="$(node -p "require('./package.json').publisher")"
+          if ! curl -sf "https://open-vsx.org/api/$publisher" >/dev/null; then
+            npx --yes ovsx create-namespace "$publisher"
+          fi
+          npx --yes ovsx publish extension.vsix --skip-duplicate

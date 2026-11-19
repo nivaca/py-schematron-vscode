@@ -8,6 +8,22 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-xmlvalidate](https://codeberg.org/nivaca/py-xmlvalidate/releases).
 
+## 0.8.0 — 2026-11-18 (py-xmlvalidate.py 1.20)
+
+- **Restricted Mode.** The extension declares what it does in a folder that
+  is not trusted: it still validates, but it ignores the folder's own
+  values for `schematron.pythonPath`, `schematron.validatorPath` and
+  `schematron.jingPath`, so a downloaded folder cannot make it run a
+  program of its choosing. VS Code shows this in the Restricted Mode
+  dialog. Virtual workspaces are declared unsupported.
+- The publishing workflow creates the extension's namespace on Open VSX the
+  first time, so publishing there needs only the `OVSX_PAT` secret.
+- Carries py-xmlvalidate.py 1.20, whose `-o` finds the TEI Stylesheets
+  through `--stylesheets`, `TEI_STYLESHEETS` or ODD2RNG's configuration.
+  **Schematron: About** shows which folder it uses.
+- The unit tests run on GitHub at every push, and `tools/release.py` makes
+  a release in one command.
+
 ## 0.7.0 — 2026-11-18 (py-xmlvalidate.py 1.19)
 
 - **Schematron: About** shows what the extension is (its version, author,

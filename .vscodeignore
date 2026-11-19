@@ -15,3 +15,4 @@ images/*.svg
 py-xmlvalidate.py
 .github/**
 dist/**
+tools/**

@@ -182,6 +182,16 @@ Changing any `schematron.*` setting re-validates the open files.
 The **Schematron** output channel (**Schematron: Show Output**) logs every
 command run and its stderr.
 
+## Restricted Mode
+
+In a folder you have not marked as trusted, VS Code runs extensions in
+Restricted Mode. This extension still validates there, but it ignores the
+folder's own values (in `.vscode/settings.json`) for the three settings
+that name programs to run: `schematron.pythonPath`,
+`schematron.validatorPath` and `schematron.jingPath`. Only your user
+settings count for them, so a folder you download cannot make the
+extension run a program of its choosing. The other settings work as usual.
+
 ## Commands
 
 Open the Command Palette (Ctrl+Shift+P) and type "Schematron":

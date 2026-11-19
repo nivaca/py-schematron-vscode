@@ -2,7 +2,7 @@
   "name": "validate-schematron",
   "displayName": "Schematron Validator (py-xmlvalidate)",
   "description": "Validates XML/TEI documents against Schematron rules (from a .sch, an ODD or a RelaxNG with embedded rules) and, optionally, RelaxNG structure via jing, as you type. Requires Python 3 with the saxonche and lxml libraries: see 'Before you start'.",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "publisher": "NicolasVaughan",
   "icon": "images/icon.png",
   "galleryBanner": {
@@ -31,6 +31,21 @@
   "activationEvents": [
     "onLanguage:xml"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "restrictedConfigurations": [
+        "schematron.pythonPath",
+        "schematron.validatorPath",
+        "schematron.jingPath"
+      ],
+      "description": "In Restricted Mode the extension still validates, but it ignores the folder's own settings for the programs it runs (pythonPath, validatorPath, jingPath) and uses only your user settings."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "Validation runs Python and jing on files on disk."
+    }
+  },
   "contributes": {
     "commands": [
       {
