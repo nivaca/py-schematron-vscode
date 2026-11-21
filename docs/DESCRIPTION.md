@@ -21,7 +21,8 @@ no runtime dependencies besides VS Code; it is built with TypeScript
 (Apache License 2.0) and packaged with vsce (MIT licence).  The program
 it runs, py-schematron.py, is under the GPL too, and uses Saxon HE,
 through saxonche (Mozilla Public License 2.0), and lxml (BSD licence);
-jing, by James Clark, is under a BSD licence.
+jing, by James Clark, is under a BSD licence.  The full list, with the
+npm packages used to build and test it, is in `docs/THIRD-PARTY.md`.
 
 Nicolas Vaughan is Associate Professor of Literature at the School of Arts
 and Humanities of the Universidad de los Andes, Bogotá, Colombia.

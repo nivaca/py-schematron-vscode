@@ -1,4 +1,4 @@
-# py-schematron-vscode 0.12.0: descripción
+# py-schematron-vscode 0.12.1: descripción
 
 ## Análisis
 
@@ -58,6 +58,6 @@ Solo necesita internet para descargar los esquemas remotos la primera vez, o al 
 
 Fue desarrollada en Fedora Linux 45 con KDE Plasma, con Node.js 22, TypeScript, Visual Studio Code y git, y probada en GitHub Actions en Linux, Windows y macOS.
 
-El código está en el repositorio py-schematron-vscode, publicado en Codeberg (https://codeberg.org/nivaca/py-schematron-vscode) y en GitHub. Cada versión se etiqueta `vA.B.C` y se publica en las dos forjas con su `.vsix`, mediante `tools/release.py`; el historial de cambios está en `CHANGELOG.md`. La extensión está en el Visual Studio Marketplace, con el editor NicolasVaughan; cada versión se sube allí a mano, porque la publicación automática con Trusted Publishing todavía no funciona con los repositorios nuevos de GitHub. El flujo de publicación puede subirla también a Open VSX si el repositorio tiene el secreto `OVSX_PAT`.
+El código está en el repositorio py-schematron-vscode, publicado en Codeberg (https://codeberg.org/nivaca/py-schematron-vscode) y en GitHub. Cada versión se etiqueta `vA.B.C` y se publica en las dos forjas con su `.vsix`, mediante `tools/release.py`; el historial de cambios está en `CHANGELOG.md`. La extensión es software libre, bajo la GPL, versión 3 o posterior; el software que usa, con la licencia de cada uno, está en `docs/THIRD-PARTY_es.md`. La extensión está en el Visual Studio Marketplace, con el editor NicolasVaughan; cada versión se sube allí a mano, porque la publicación automática con Trusted Publishing todavía no funciona con los repositorios nuevos de GitHub. El flujo de publicación puede subirla también a Open VSX si el repositorio tiene el secreto `OVSX_PAT`.
 
 Se instala desde el Marketplace, o con el `.vsix` de una versión y `code --install-extension`. Para desarrollarla: `npm install`, `npm run compile` y `npm test`. Los ajustes `schematron.*` se guardan en el `settings.json` del usuario o de la carpeta de trabajo, y los esquemas descargados, en el caché `.schema-cache/` junto a la copia del programa.

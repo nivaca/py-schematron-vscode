@@ -8,6 +8,15 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-schematron](https://codeberg.org/nivaca/py-schematron/releases).
 
+## 0.12.1 — 2026-11-21 (py-schematron.py 2.7)
+
+- `docs/THIRD-PARTY.md` (and `docs/THIRD-PARTY_es.md`, in Spanish): the
+  open-source software the extension uses, and the licence of each: VS
+  Code, Python, saxonche, lxml, jing, the TEI Stylesheets, and the npm
+  packages and tools used to build and test it. None of it is in the
+  `.vsix`.
+- Carries py-schematron.py 2.7.
+
 ## 0.12.0 — 2026-11-19 (py-schematron.py 2.6)
 
 - **jing on Windows.** `schematron.jingPath` can name a `jing.jar`, which
