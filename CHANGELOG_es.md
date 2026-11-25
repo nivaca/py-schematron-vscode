@@ -28,6 +28,9 @@ cambió. Las versiones, con sus archivos `.vsix`, están en
   lo hay, y nunca lo publica. `tools/release.py` reúne ahora el depósito
   después de la etiqueta y lo sube como borrador, salvo con `--no-zenodo`.
   Los metadatos están en `.zenodo.json`.
+- `tools/zenodo.py`: la descripción del depósito deja fuera la línea que
+  lleva a los README en otras lenguas y la sección Screenshots, cuyas
+  imágenes Zenodo no muestra.
 
 ## 0.12.1 — 2026-11-21 (py-schematron.py 2.7)
 
