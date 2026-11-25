@@ -8,6 +8,18 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-schematron](https://codeberg.org/nivaca/py-schematron/releases).
 
+## Unreleased
+
+- `tools/zenodo.py` prepares the deposit of a release for Zenodo. `collect`
+  puts in `dist/zenodo/` the tree of the tag as
+  `py-schematron-vscode-VERSION-source.tar.gz`, with its signature, a signed
+  `SHA256SUMS` of the deposit and the public key, and checks every signature
+  with only that key (`--packages` adds the files of the release). `upload`
+  sends it to Zenodo as a draft, a new version of the deposit if there is
+  one already, and never publishes it. `tools/release.py` now collects the
+  deposit after the tag and uploads it as a draft, unless `--no-zenodo`. The
+  metadata are in `.zenodo.json`.
+
 ## 0.12.1 — 2026-11-21 (py-schematron.py 2.7)
 
 - `docs/THIRD-PARTY.md` (and `docs/THIRD-PARTY_es.md`, in Spanish): the

@@ -18,3 +18,4 @@ dist/**
 tools/**
 docs/**
 packaging/**
+.zenodo.json
