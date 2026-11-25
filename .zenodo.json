@@ -1,12 +1,19 @@
 {
   "title": "Schematron Validator (py-schematron)",
   "upload_type": "software",
-  "description": "<p>A VS Code extension that validates XML and TEI documents against Schematron rules (from a .sch, an ODD or a RELAX NG schema with embedded rules) and, optionally, against their RELAX NG structure, as you type.</p>",
   "creators": [
     {
       "name": "Vaughan, Nicolas",
       "affiliation": "Universidad de los Andes",
       "orcid": "0000-0002-2877-0539"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Vaughan, Nicolas",
+      "affiliation": "Universidad de los Andes",
+      "orcid": "0000-0002-2877-0539",
+      "type": "ProjectLeader"
     }
   ],
   "license": "gpl-3.0-or-later",
@@ -17,5 +24,10 @@
     "XML",
     "Schematron",
     "validation"
-  ]
+  ],
+  "languages": [
+    "eng"
+  ],
+  "programming_language": "typescript",
+  "development_status": "active"
 }
