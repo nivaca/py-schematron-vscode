@@ -39,9 +39,12 @@ cambió. Las versiones, con sus archivos `.vsix`, están en
 - `tools/release.py` hace el `.vsix`, su firma y `SHA256SUMS` en
   `build/release/` (también allí lo deja `npm run package`), y
   `tools/zenodo.py` el depósito en `build/zenodo/`; se publican desde allí y
-  se borran al final. En `dist/` solo queda el código fuente del depósito
-  (`.tar.gz`), el más nuevo, en lugar de los anteriores; el `.vsix`, las
-  firmas y `SHA256SUMS`, no.
+  se borran al final. En `dist/` solo quedan el zip del código y el código
+  fuente del depósito (`.tar.gz`), el más nuevo de cada uno, en lugar de los
+  anteriores; el `.vsix`, las firmas y `SHA256SUMS`, no.
+- Cada versión trae también un zip del código de la extensión,
+  `py-schematron-vscode-v.VERSIÓN.zip` (`git archive` del commit de la
+  etiqueta), firmado y en `SHA256SUMS`, como el `.vsix`.
 
 ## 0.12.1 — 2026-11-21 (py-schematron.py 2.7)
 

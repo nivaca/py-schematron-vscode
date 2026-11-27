@@ -18,13 +18,14 @@ está:
                         archivo: py-schematron.el-v.VERSION.zip (tools/bundle-zip.py)
   py-schematron-vscode  versión: package.json
                         notas:   su sección de CHANGELOG.md
-                        archivo: validate-schematron-VERSION.vsix (npm run package)
+                        archivos: validate-schematron-VERSION.vsix (npm run package) y
+                                  py-schematron-vscode-v.VERSION.zip (git archive)
   ODD2RNG               versión: el __version__ de odd2rng.py
                         notas:   su sección de CHANGELOG.md
                         archivo: ODD2RNG-v.VERSION.zip (tools/bundle-zip.py)
 
-El archivo se hace en build/release/, no en dist/, y allí van también su firma
-y SHA256SUMS; la etiqueta es vVERSION.  De una versión publicada solo quedan
+Los archivos se hacen en build/release/, no en dist/, y allí van también sus
+firmas y SHA256SUMS; la etiqueta es vVERSION.  De una versión publicada solo quedan
 en dist/ el zip (no el .vsix de la extensión) y el código fuente del depósito
 para Zenodo (NOMBRE-VERSIÓN-source.tar.gz).  En orden, el script:
 
@@ -40,7 +41,7 @@ para Zenodo (NOMBRE-VERSIÓN-source.tar.gz).  En orden, el script:
      tools/corpus-check.py, que compara los resultados con los de la última
      versión en cada documento, y se detiene si alguno cambió
      (--accept-corpus-changes, cuando el cambio es querido);
-  3. hace el archivo en build/release/ y lo firma con la clave del proyecto
+  3. hace los archivos en build/release/ y los firma con la clave del proyecto
      (SIGNING_KEY): una firma separada en ASCII, FILE.asc, y
      build/release/SHA256SUMS con su propio SHA256SUMS.asc; luego comprueba
      cada firma como lo haría un usuario, en un GNUPGHOME temporal que solo
@@ -51,7 +52,7 @@ para Zenodo (NOMBRE-VERSIÓN-source.tar.gz).  En orden, el script:
      etiqueta a Codeberg y a GitHub; una etiqueta sin firmar que ya esté allí,
      en el mismo commit, se reemplaza por la firmada;
   5. crea la versión en Codeberg (con tea) y en GitHub (con gh), con las notas,
-     el archivo, las firmas, SHA256SUMS y la clave pública (y pone al día las
+     los archivos, las firmas, SHA256SUMS y la clave pública (y pone al día las
      notas de una versión que ya existe);
   6. descarga cada archivo de las dos forjas y lo compara con el local;
   7. reúne el depósito para Zenodo en build/zenodo/ (tools/zenodo.py collect:
@@ -314,6 +315,10 @@ class Program:
     def asset(self, version):
         return OUT / f"py-schematron-v.{version}.zip"
 
+    def assets(self, version):
+        """Every file of the release (the first, the one the notes name)."""
+        return [self.asset(version)]
+
     def footer(self, name):
         return (f"File: `{name}`, the scripts, the tests and the documentation.")
 
@@ -350,6 +355,9 @@ class Emacs:
 
     def asset(self, version):
         return OUT / f"py-schematron.el-v.{version}.zip"
+
+    def assets(self, version):
+        return [self.asset(version)]
 
     def footer(self, name):
         return ("With Straight: `M-x straight-pull-package RET py-schematron`, then restart "
@@ -409,9 +417,16 @@ class VSCode:
     def asset(self, version):
         return OUT / f"validate-schematron-{version}.vsix"
 
+    def assets(self, version):
+        return [self.asset(version), self.source_zip(version)]
+
+    def source_zip(self, version):
+        return OUT / f"py-schematron-vscode-v.{version}.zip"
+
     def footer(self, name):
         return ("Install it from the Visual Studio Marketplace, or with this `.vsix`: "
-                f"`code --install-extension {name}`.\n\nFile: `{name}`, the extension.")
+                f"`code --install-extension {name}`.\n\nFiles: `{name}`, the extension; "
+                f"`{self.source_zip(self.version()).name}`, its source.")
 
     def test(self):
         env = dict(os.environ)
@@ -421,6 +436,10 @@ class VSCode:
     def build(self, version):
         # (npm run package lo deja en build/release/: vsce package -o build/release/)
         run("npm", "run", "package", capture=False)
+        # El código fuente, el árbol de HEAD, en un zip aparte
+        zip_path = self.source_zip(version)
+        run("git", "archive", "--format=zip", f"--prefix={zip_path.stem}/",
+            "--output", str(zip_path), "HEAD", capture=False)
 
 
 class Odd2rng(Program):
@@ -640,13 +659,16 @@ def main(argv=None):
         say("== the file")
         OUT.mkdir(parents=True, exist_ok=True)
         k.build(version)
-        asset = k.asset(version)
-        if not asset.is_file():
-            raise Failure(f"The build did not make {asset}")
-        say(f"  {asset.relative_to(ROOT)} ({asset.stat().st_size:,} bytes)")
+        # (el primero es el archivo principal, el que nombran las notas)
+        files = k.assets(version)
+        asset = files[0]
+        for made in files:
+            if not made.is_file():
+                raise Failure(f"The build did not make {made}")
+            say(f"  {made.relative_to(ROOT)} ({made.stat().st_size:,} bytes)")
         say("== signatures")
         key, public = signing_key(), public_key(k.repo)
-        assets = sign_files([asset], key, public, SUMS)
+        assets = sign_files(files, key, public, SUMS)
         fpr = " ".join(key[i:i + 4] for i in range(0, len(key), 4))
         body = (f"{notes}\n\n{k.footer(asset.name)}\n\n"
                 f"Every file is signed with the project's key ({fpr}): `FILE.asc` is the "
@@ -701,7 +723,7 @@ def main(argv=None):
         else:
             run(*zenodo, "upload", *([] if args.zenodo_draft else ["--publish"]), capture=False)
         say("== keep in dist/")
-        keep_in_dist([asset, ZENODO_OUT / f"{k.repo}-{version}-source.tar.gz"])
+        keep_in_dist([*files, ZENODO_OUT / f"{k.repo}-{version}-source.tar.gz"])
         say("== clean up")
         clean_up()
         say(f"== {k.repo} {version} released")

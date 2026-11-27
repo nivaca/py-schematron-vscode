@@ -260,9 +260,12 @@ npm run package     # -> build/release/validate-schematron-<version>.vsix
 code --install-extension build/release/validate-schematron-<version>.vsix
 ```
 
-`tools/release.py` makes the `.vsix` the same way, publishes it from
-`build/release/` with its signature and `SHA256SUMS`, and deletes that
-folder (and the deposit for Zenodo, in `build/zenodo/`) at the end.
+`tools/release.py` makes the `.vsix` the same way, and a zip of the source
+(`py-schematron-vscode-v.<version>.zip`, with `git archive`), publishes both
+from `build/release/` with their signatures and `SHA256SUMS`, keeps the zip
+and the source archive of the deposit in `dist/` (the newest of each), and
+deletes `build/release/` (and the deposit for Zenodo, in `build/zenodo/`) at
+the end.
 
 Packaging copies the repository's `py-schematron.py` into the extension
 (`validator/`), so the `.vsix` works on its own. That copy is kept in step
