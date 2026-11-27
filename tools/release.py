@@ -24,7 +24,9 @@ está:
                         archivo: ODD2RNG-v.VERSION.zip (tools/bundle-zip.py)
 
 El archivo se hace en build/release/, no en dist/, y allí van también su firma
-y SHA256SUMS; la etiqueta es vVERSION.  En orden, el script:
+y SHA256SUMS; la etiqueta es vVERSION.  De una versión publicada solo quedan
+en dist/ el zip (no el .vsix de la extensión) y el código fuente del depósito
+para Zenodo (NOMBRE-VERSIÓN-source.tar.gz).  En orden, el script:
 
   1. comprueba: que está en main, sin nada fuera de un commit, con una etiqueta
      nueva o ya puesta en este commit, que encontró las notas de la versión,
@@ -58,10 +60,12 @@ y SHA256SUMS; la etiqueta es vVERSION.  En orden, el script:
      DOI nuevo), con el token de $ZENODO_TOKEN o del llavero, salvo con
      --no-zenodo; con --zenodo-draft queda como borrador, para publicarlo a
      mano;
-  8. borra build/release/ y build/zenodo/ (y build/, si no queda nada más en
-     él): las forjas y Zenodo tienen lo que contenían, y ninguno de estos
-     proyectos guarda aquí un paquete (solo se guardaría un RPM, y no hacen
-     ninguno), así que dist/ queda vacío.
+  8. copia a dist/ el zip y el código fuente (el .tar.gz del depósito), en
+     lugar de los de versiones anteriores: dist/ guarda solo el más nuevo de
+     cada clase (.zip, .tar.gz; un .rpm, si lo hubiera), sin firmas ni
+     SHA256SUMS;
+  9. borra build/release/ y build/zenodo/ (y build/, si no queda nada más en
+     él): las forjas y Zenodo tienen lo que contenían, firmas incluidas.
 
 Cada paso ya hecho se salta (una etiqueta firmada o una versión que existe, una
 firma que sigue comprobándose, un archivo ya adjunto), así que después de un
@@ -100,16 +104,55 @@ FORGES = {"Codeberg": "codeberg.org", "GitHub": "github.com"}
 # proyectos del autor (la que fija packaging/build-rpm.sh en los que hacen
 # un RPM).  $SIGNING_KEY la cambia solo en una prueba o un caso raro.
 SIGNING_KEY = "81870643CA221AF90C30554EBE6832CD35994948"
-# Lo que se publica se hace y se firma en build/release/, no en dist/: en local solo se guardaría un RPM, y
-# estos proyectos no hacen ninguno.  Al final se borra, con build/zenodo/.
+# Lo que se publica se hace y se firma en build/release/, no en dist/; de una versión publicada solo quedan
+# en dist/ el zip y el código fuente, el más nuevo de cada uno.  Al final se borra, con build/zenodo/.
 OUT = ROOT / "build" / "release"
 SUMS = OUT / "SHA256SUMS"
 ZENODO_OUT = ROOT / "build" / "zenodo"  # (where tools/zenodo.py collects the deposit)
+DIST = ROOT / "dist"
+# Only these kinds of file are kept in dist/, the newest of each
+DIST_SUFFIXES = (".zip", ".tar.gz")
+
+
+def keep_in_dist(files: list[Path], dist: Path = DIST) -> list[Path]:
+    """Copy FILES (the zip, the source archive) to DIST, deleting their older versions there: the files of
+    DIST named as each one but with another version.  A file not of DIST_SUFFIXES is not copied (the .vsix).
+    Return the copies."""
+    dist.mkdir(parents=True, exist_ok=True)
+    kept = []
+    for path in files:
+        if not path.name.endswith(DIST_SUFFIXES):
+            continue
+        if not path.is_file():
+            raise Failure(f"There is no {path}, to keep in {dist.name}/")
+        for old in dist.glob(older_versions(path.name)):
+            if old.name != path.name and old.is_file():
+                old.unlink()
+                say(f"  {dist.name}/{old.name} deleted (an older version)")
+        target = dist / path.name
+        shutil.copy2(path, target)
+        say(f"  {path.name} kept in {dist.name}/")
+        kept.append(target)
+    return kept
+
+
+def older_versions(name: str) -> str:
+    """The glob of NAME's other versions: py-schematron-v.2.1.zip gives py-schematron-v.*.zip, and
+    ODD2RNG-1.0-source.tar.gz gives ODD2RNG-*-source.tar.gz."""
+    # La versión es lo que va de después de "-" o "-v." hasta el sufijo
+    m = re.fullmatch(r"(.+?-(?:v\.)?)\d[\w.]*?((?:-source)?\.(?:zip|tar\.gz))", name)
+    if not m:
+        raise Failure(f"No version in {name}")
+    return f"{glob_escape(m.group(1))}*{m.group(2)}"
+
+
+def glob_escape(text: str) -> str:
+    return re.sub(r"([*?\[])", r"[\1]", text)
 
 
 def clean_up():
     """Once all is published: build/release/ and build/zenodo/ deleted, and build/ too if nothing else is in it
-    (nothing is kept here; the forges and Zenodo have it all)."""
+    (keep_in_dist has copied the zip and the source to dist/; the forges and Zenodo have it all)."""
     for folder in (OUT, ZENODO_OUT):
         if folder.exists():
             shutil.rmtree(folder)
@@ -614,7 +657,8 @@ def main(argv=None):
             upload = " and upload it as a draft" if args.zenodo_draft else " and publish it"
             zenodo = "collect the deposit for Zenodo" + ("" if args.no_zenodo else upload)
             say(f"== dry run: would tag {tag}, push main and {tag} to Codeberg and GitHub, "
-                f"release with these notes, {zenodo}, and at the end delete "
+                f"release with these notes, {zenodo}, keep the zip and the source in "
+                f"{DIST.relative_to(ROOT)}/, and at the end delete "
                 f"{OUT.relative_to(ROOT)}/ and {ZENODO_OUT.relative_to(ROOT)}/:\n")
             say(body)
             return
@@ -656,6 +700,8 @@ def main(argv=None):
             say("  not uploaded (--no-zenodo)")
         else:
             run(*zenodo, "upload", *([] if args.zenodo_draft else ["--publish"]), capture=False)
+        say("== keep in dist/")
+        keep_in_dist([asset, ZENODO_OUT / f"{k.repo}-{version}-source.tar.gz"])
         say("== clean up")
         clean_up()
         say(f"== {k.repo} {version} released")

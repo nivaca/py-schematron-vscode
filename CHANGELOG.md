@@ -38,8 +38,9 @@ changed. The releases, with their `.vsix` files, are on
 - `tools/release.py` makes the `.vsix`, its signature and `SHA256SUMS` in
   `build/release/` (`npm run package` puts it there too), and
   `tools/zenodo.py` the deposit in `build/zenodo/`; both are published from
-  there and deleted at the end of the release, so nothing is kept in `dist/`
-  any more.
+  there and deleted at the end of the release. Only the source archive of
+  the deposit (`.tar.gz`) is kept in `dist/`, the newest one, in place of
+  older ones; the `.vsix`, the signatures and `SHA256SUMS` are not.
 
 ## 0.12.1 — 2026-11-21 (py-schematron.py 2.7)
 

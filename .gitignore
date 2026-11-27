@@ -2,7 +2,7 @@ node_modules/
 out/
 validator/
 # packages: npm run package leaves them in build/release/, which tools/release.py
-# publishes and then deletes (dist/ is not used any more)
+# publishes and then deletes (dist/ keeps only the newest source archive)
 *.vsix
 build/
 dist/
