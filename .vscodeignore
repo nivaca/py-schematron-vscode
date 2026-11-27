@@ -15,6 +15,7 @@ images/*.svg
 py-schematron.py
 .github/**
 dist/**
+build/**
 tools/**
 docs/**
 packaging/**

@@ -256,9 +256,13 @@ npm test            # set VALIDATE_PYTHON=/path/to/python to include the end-to-
 # Real VS Code, headless (Linux), with a throwaway profile:
 env -u WAYLAND_DISPLAY VALIDATE_PYTHON=/path/to/python JING=$(command -v jing) \
   VSCODE_PATH=/usr/share/code/code xvfb-run -a npm run test:integration
-npm run package     # -> dist/validate-schematron-<version>.vsix
-code --install-extension dist/validate-schematron-<version>.vsix
+npm run package     # -> build/release/validate-schematron-<version>.vsix
+code --install-extension build/release/validate-schematron-<version>.vsix
 ```
+
+`tools/release.py` makes the `.vsix` the same way, publishes it from
+`build/release/` with its signature and `SHA256SUMS`, and deletes that
+folder (and the deposit for Zenodo, in `build/zenodo/`) at the end.
 
 Packaging copies the repository's `py-schematron.py` into the extension
 (`validator/`), so the `.vsix` works on its own. That copy is kept in step

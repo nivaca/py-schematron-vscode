@@ -1,7 +1,10 @@
 node_modules/
 out/
 validator/
-*.vsix# packages (npx vsce package -o dist/)
+# packages: npm run package leaves them in build/release/, which tools/release.py
+# publishes and then deletes (dist/ is not used any more)
+*.vsix
+build/
 dist/
 # py-schematron.py run from here (tests) keeps its download cache next to it
 .schema-cache/

@@ -191,7 +191,7 @@
     "bundle-validator": "node scripts/bundle-validator.js",
     "vscode:prepublish": "npm run compile && npm run bundle-validator",
     "test": "npm run compile && node --test out/test/*.test.js",
-    "package": "node -e \"require('fs').mkdirSync('dist', {recursive: true})\" && vsce package -o dist/",
+    "package": "node -e \"require('fs').mkdirSync('build/release', {recursive: true})\" && vsce package -o build/release/",
     "test:integration": "npm run compile && npm run bundle-validator && node out/test/integration/runTest.js"
   },
   "devDependencies": {
