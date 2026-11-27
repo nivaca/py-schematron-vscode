@@ -8,7 +8,7 @@ changed. The releases, with their `.vsix` files, are on
 0.5.12 they were published in
 [py-schematron](https://codeberg.org/nivaca/py-schematron/releases).
 
-## Unreleased
+## 0.12.2 — 2026-11-27 (py-schematron.py 2.7)
 
 - `tools/zenodo.py`: the description of the deposit is now the whole
   README of the tag, in HTML. The draft also gets the contributor (the
@@ -38,9 +38,9 @@ changed. The releases, with their `.vsix` files, are on
 - `tools/release.py` makes the `.vsix`, its signature and `SHA256SUMS` in
   `build/release/` (`npm run package` puts it there too), and
   `tools/zenodo.py` the deposit in `build/zenodo/`; both are published from
-  there and deleted at the end of the release. Only the zip of the source
-  and the source archive of the deposit (`.tar.gz`) are kept in `dist/`,
-  the newest of each, in place of older ones; the `.vsix`, the signatures
+  there and deleted at the end of the release. Only the `.vsix`, the zip
+  of the source and the source archive of the deposit (`.tar.gz`) are kept
+  in `dist/`, the newest of each, in place of older ones; the signatures
   and `SHA256SUMS` are not.
 - Each release has a zip of the extension's source too,
   `py-schematron-vscode-v.VERSION.zip` (`git archive` of the tagged

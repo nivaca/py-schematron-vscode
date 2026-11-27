@@ -1,4 +1,4 @@
-# py-schematron-vscode 0.12.1: descripción
+# py-schematron-vscode 0.12.2: descripción
 
 ## Análisis
 
